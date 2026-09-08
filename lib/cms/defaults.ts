@@ -10,17 +10,11 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
     performancePercent: 69,
     performanceLabel: 'de performance',
     primaryButton: 'Criar reunião',
-    secondaryButton: 'Entrar'
+    secondaryButton: 'Entrar',
+    imageUrl: ''
   },
-  nextMeeting: {
-    label: 'Seu próximo encontro',
-    dateTime: '14:00 — 30 Set 2026'
-  },
-  profile: {
-    name: 'Sandro Bello',
-    avatarUrl: '',
-    planLabel: 'ZYVO Pro'
-  },
+  nextMeeting: { label: 'Seu próximo encontro', dateTime: '14:00 — 30 Set 2026' },
+  profile: { name: 'Sandro Bello', avatarUrl: '', planLabel: 'ZYVO Pro' },
   navigation: {
     searchPlaceholder: 'Buscar reunião, pessoa ou gravação...',
     top: ['Início', 'Skills', 'Agenda', 'Planos e Preços'],
