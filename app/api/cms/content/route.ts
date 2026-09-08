@@ -25,7 +25,7 @@ export async function PUT(request:Request){
   catch(e){ return NextResponse.json({error:e instanceof Error?e.message:'Conteúdo inválido.'},{status:400}); }
 
   const siteRows=[
-    ['hero','eyebrow',content.hero.eyebrow],['hero','title',content.hero.title],['hero','ratingText',content.hero.ratingText],['hero','performancePercent',content.hero.performancePercent],['hero','performanceLabel',content.hero.performanceLabel],['hero','primaryButton',content.hero.primaryButton],['hero','secondaryButton',content.hero.secondaryButton],
+    ['hero','eyebrow',content.hero.eyebrow],['hero','title',content.hero.title],['hero','ratingText',content.hero.ratingText],['hero','performancePercent',content.hero.performancePercent],['hero','performanceLabel',content.hero.performanceLabel],['hero','primaryButton',content.hero.primaryButton],['hero','secondaryButton',content.hero.secondaryButton],['hero','imageUrl',content.hero.imageUrl],
     ['nextMeeting','label',content.nextMeeting.label],['nextMeeting','dateTime',content.nextMeeting.dateTime],
     ['profile','name',content.profile.name],['profile','avatarUrl',content.profile.avatarUrl],['profile','planLabel',content.profile.planLabel],
     ['navigation','searchPlaceholder',content.navigation.searchPlaceholder],['navigation','top',content.navigation.top],['navigation','sidebar',content.navigation.sidebar],
