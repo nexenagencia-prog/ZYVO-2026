@@ -18,34 +18,12 @@ export default function HomeClient({content}:{content:HomeContent}){
   const fileRef=useRef<HTMLInputElement>(null);
   const slides=useMemo(()=>{const active=content.carousel.filter(x=>x.isActive);return active.length?active:content.carousel;},[content.carousel]);
 
-  useEffect(()=>{
-    try{
-      const savedAvatar=window.localStorage.getItem(PROFILE_AVATAR_KEY);
-      if(savedAvatar)setAvatar(savedAvatar);
-    }catch{}
-  },[]);
-
+  useEffect(()=>{try{const savedAvatar=window.localStorage.getItem(PROFILE_AVATAR_KEY);if(savedAvatar)setAvatar(savedAvatar)}catch{}},[]);
   useEffect(()=>{requestAnimationFrame(()=>setLoaded(true));if(!slides.length)return;const t=setInterval(()=>setSlide(s=>(s+1)%slides.length),content.carouselIntervalMs||4000);return()=>clearInterval(t)},[slides.length,content.carouselIntervalMs]);
   useEffect(()=>setSlide(0),[slides]);
 
-  const changeAvatar=(e:ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];
-    if(!f)return;
-    const r=new FileReader();
-    r.onload=()=>{
-      const nextAvatar=String(r.result);
-      setAvatar(nextAvatar);
-      try{window.localStorage.setItem(PROFILE_AVATAR_KEY,nextAvatar)}catch{}
-    };
-    r.readAsDataURL(f);
-  };
-
-  const handleSidebarClick=(e:MouseEvent<HTMLElement>)=>{
-    const target=e.target as HTMLElement;
-    if(target.closest('button,input,a'))return;
-    setExpanded(v=>!v);
-  };
-
+  const changeAvatar=(e:ChangeEvent<HTMLInputElement>)=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{const nextAvatar=String(r.result);setAvatar(nextAvatar);try{window.localStorage.setItem(PROFILE_AVATAR_KEY,nextAvatar)}catch{}};r.readAsDataURL(f)};
+  const handleSidebarClick=(e:MouseEvent<HTMLElement>)=>{const target=e.target as HTMLElement;if(target.closest('button,input,a'))return;setExpanded(v=>!v)};
   const go=(d:number)=>setSlide(s=>slides.length?(s+d+slides.length)%slides.length:0);
   const current=slides[slide];
   const heroStyle=content.hero.imageUrl?{backgroundImage:`url(${content.hero.imageUrl})`}:undefined;
@@ -59,7 +37,7 @@ export default function HomeClient({content}:{content:HomeContent}){
       <button className="sidebar-toggle" onClick={()=>setExpanded(v=>!v)} aria-label={expanded?'Recolher menu':'Expandir menu'}>{expanded?<ChevronLeft size={20}/>:<ChevronRight size={20}/>}</button>
     </aside>
 
-    <section className={`content ${expanded?'shifted':''}`}><header className="topbar"><div className="search-box"><Search size={27}/><span>{content.navigation.searchPlaceholder}</span><kbd>⌘ K</kbd></div><nav className="topnav">{content.navigation.top.map((label,i)=><a className={i===0?'current':''} key={label}>{label}</a>)}</nav><div className="next-meeting"><span>{content.nextMeeting.label}</span><strong>{content.nextMeeting.dateTime}</strong></div><button className="menu-top" onClick={()=>setExpanded(v=>!v)} aria-label={expanded?'Recolher menu':'Expandir menu'}>{expanded?<ChevronLeft size={18}/>:<ChevronRight size={18}/>}</button></header>
+    <section className={`content ${expanded?'shifted':''}`}><header className="topbar"><div className="search-box"><Search size={27}/><span>{content.navigation.searchPlaceholder}</span><kbd>⌘ K</kbd></div><nav className="topnav">{content.navigation.top.map((label,i)=><a className={i===0?'current':''} key={label}>{label}</a>)}</nav><div className="next-meeting"><span>{content.nextMeeting.label}</span><strong>{content.nextMeeting.dateTime}</strong></div></header>
 
       <section className="hero-grid"><div className="hero-copy"><div className="eyebrow">{content.hero.eyebrow}</div><h1>{titleLines.map((line,i)=><span key={i}>{line}{i<titleLines.length-1&&<br/>}</span>)}</h1><div className="rating-line"><div className="stars">{[0,1,2,3,4].map(n=><Star key={n} size={20} fill="currentColor"/>)}</div><span>{content.hero.ratingText}</span></div><div className="hero-score"><b>{content.hero.performancePercent}%</b> {content.hero.performanceLabel}</div><div className="progress"><i style={{'--p':`${content.hero.performancePercent}%`} as CSSProperties}/></div><div className="ticks"/><div className="hero-actions"><button className="primary-btn"><Video size={22}/>{content.hero.primaryButton}<ArrowRight size={22}/></button><button className="secondary-btn"><Play size={25}/>{content.hero.secondaryButton}<ArrowRight size={22}/></button></div></div>
         <div className="hero-feature"><div className="feature-card">{current?.imageUrl?<div className="feature-photo" key={current.id||slide} style={{backgroundImage:`url(${current.imageUrl})`}}/>:<div className="feature-logo" key={slide}>{slide===0?'Z':slide===1?'AI':String(content.hero.performancePercent)}</div>}<div className="feature-text" key={`t${slide}`}>{current?.title||'Mais do que reuniões.'}<br/>{current?.subtitle||'Evolução.'}</div><div className="feature-dot"/><div className="slider-dashes">{slides.map((_,i)=><i key={i} className={i===slide?'on':''}/>)}</div><div className="feature-arrows"><button onClick={()=>go(-1)}><ArrowLeft/></button><button onClick={()=>go(1)}><ArrowRight/></button></div></div></div>
