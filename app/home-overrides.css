@@ -1,0 +1,35 @@
+/* Final Home overrides. Loaded after globals/refine/cms-home to avoid legacy CSS winning by specificity. */
+html body{font-weight:300}
+
+.hero-copy h1,.hero-copy h1 span{
+  font-weight:430;
+  background:linear-gradient(180deg,#b9ccec 0%,#a9bfe4 58%,#98b0d8 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+}
+
+.eyebrow,.search-box span,.search-box kbd,.topnav a,.next-meeting span,.rating-line span,.hero-score,.info-card p,.avatar-meta>span,.side-item,.sidebar-toggle{
+  font-weight:300;
+}
+
+.topnav .current,.next-meeting strong,.name-edit strong,.info-card h2{
+  font-weight:430;
+}
+
+.feature-text{font-weight:380}
+.primary-btn,.secondary-btn{font-weight:380}
+.secondary-btn{font-weight:430}
+
+.hero-score{font-size:16px}
+.hero-score b{font-size:21px;font-weight:430}
+
+.search-box{transform:translateY(-12px)}
+
+/* The only expand/collapse control is inside the sidebar. */
+.menu-top{display:none!important}
+
+@media(max-width:1450px){
+  .search-box{transform:translateY(-10px)}
+}
