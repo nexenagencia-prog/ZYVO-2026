@@ -28,6 +28,7 @@ export type HomeContent = {
     performanceLabel: string;
     primaryButton: string;
     secondaryButton: string;
+    imageUrl: string;
   };
   nextMeeting: {
     label: string;
