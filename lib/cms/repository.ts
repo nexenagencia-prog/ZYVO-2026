@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { DEFAULT_HOME_CONTENT } from './defaults';
 import type { HomeContent } from './types';
@@ -11,7 +12,7 @@ function publicClient(){
   return createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 }
 
-export async function loadHomeContent(): Promise<HomeContent> {
+async function loadHomeContentUncached(): Promise<HomeContent> {
   const content=cloneDefaults();
   try{
     const supabase=publicClient();
@@ -42,3 +43,9 @@ export async function loadHomeContent(): Promise<HomeContent> {
     return content;
   }
 }
+
+export const loadHomeContent=unstable_cache(
+  loadHomeContentUncached,
+  ['zyvo-home-content'],
+  {revalidate:3600,tags:['zyvo-home-content']}
+);
