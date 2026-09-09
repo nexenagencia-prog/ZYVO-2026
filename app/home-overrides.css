@@ -1,13 +1,17 @@
 /* Final Home overrides. Loaded after globals/refine/cms-home to avoid legacy CSS winning by specificity. */
 html body{font-weight:300}
 
-.hero-copy h1,.hero-copy h1 span{
+/* Hero title must stay solid black — never inherit the legacy blue gradient. */
+html body .hero-copy h1,
+html body .hero-copy h1 span{
   font-weight:430;
-  background:linear-gradient(180deg,#b9ccec 0%,#a9bfe4 58%,#98b0d8 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
+  background:none!important;
+  background-image:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  -webkit-text-fill-color:#0b0d0f!important;
+  color:#0b0d0f!important;
+  opacity:1!important;
 }
 
 .eyebrow,.search-box span,.search-box kbd,.topnav a,.next-meeting span,.rating-line span,.hero-score,.info-card p,.avatar-meta>span,.side-item,.sidebar-toggle{
