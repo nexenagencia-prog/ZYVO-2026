@@ -18,13 +18,19 @@ const metrics=[
   {label:'Condução',value:85,Icon:Users},
 ];
 
+const moments=[
+  {time:'12:43',title:'Objeção sobre preço',text:'Cliente levantou uma preocupação importante.',pos:'44% 38%'},
+  {time:'18:27',title:'Oportunidade identificada',text:'Interesse em implementar ainda este ano.',pos:'52% 46%'},
+  {time:'31:10',title:'Decisão',text:'Alinhamento para próxima etapa.',pos:'58% 42%'},
+];
+
 export default function SkillsPage(){
   return <main className="app-shell skills-page">
     <AppSidebar />
     <section className="content skills-site-content">
       <header className="topbar skills-site-topbar">
         <div className="zyvo-brand" aria-label="ZYVO"><span className="zyvo-mark">Z</span><span className="zyvo-word">ZYVO</span></div>
-        <div className="search-box"><Search size={27}/><span>Buscar reunião, pessoa ou gravação...</span><kbd>⌘ K</kbd></div>
+        <div className="search-box"><Search size={24}/><span>Buscar reunião, pessoa ou gravação...</span><kbd>⌘ K</kbd></div>
         <nav className="topnav">
           <Link href="/" prefetch>Início</Link>
           <Link href="/skills" prefetch className="current">Skills</Link>
@@ -53,8 +59,8 @@ export default function SkillsPage(){
             <button className="skills-more" aria-label="Mais opções">•••</button>
             <h2>Seu desempenho</h2>
             <div className="skills-score-content">
-              <div className="skills-ring"><div className="skills-ring-inner"><div><strong>86</strong><span>/100</span></div><b>↑ +7%</b><small>em relação à<br/>última reunião</small></div></div>
-              <div className="skills-score-copy"><strong>Ótima evolução!</strong><p>Você foi mais objetivo e fez<br/>perguntas mais estratégicas<br/>nesta reunião.</p></div>
+              <div className="skills-ring"><div className="skills-ring-inner"><div><strong>86</strong><span>/100</span></div><b>↑ +7%</b><small>em relação<br/>à última reunião</small></div></div>
+              <div className="skills-score-copy"><strong>Ótima evolução!</strong><p>Você foi mais objetivo e fez<br/>perguntas mais estratégicas<br/>nesta reunião.</p><button className="skills-analysis-button">Ver análise completa <ChevronRight/></button></div>
             </div>
           </article>
         </div>
@@ -77,9 +83,11 @@ export default function SkillsPage(){
 
           <article className="skills-detail-card glass-card">
             <header><span><FileText/></span><h3>Momentos importantes</h3><button><ChevronRight/></button></header>
-            <div className="skills-moment"><button><Play fill="currentColor"/></button><time>12:43</time><div><strong>Objeção sobre preço</strong><p>Cliente levantou uma preocupação importante.</p></div></div>
-            <div className="skills-moment"><button><Play fill="currentColor"/></button><time>18:27</time><div><strong>Oportunidade identificada</strong><p>Interesse em implementar ainda este ano.</p></div></div>
-            <div className="skills-moment"><button><Play fill="currentColor"/></button><time>31:10</time><div><strong>Decisão</strong><p>Alinhamento para próxima etapa.</p></div></div>
+            {moments.map((moment)=><div className="skills-moment" key={moment.time}>
+              <button className="skills-video-thumb" aria-label={`Reproduzir momento ${moment.time}`} style={{backgroundPosition:moment.pos}}><span><Play fill="currentColor"/></span></button>
+              <time>{moment.time}</time>
+              <div><strong>{moment.title}</strong><p>{moment.text}</p></div>
+            </div>)}
           </article>
 
           <article className="skills-detail-card glass-card">
