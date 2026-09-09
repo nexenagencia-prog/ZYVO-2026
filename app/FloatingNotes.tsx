@@ -16,6 +16,7 @@ type NoteRecord = {
 };
 
 const GUEST_NOTES_KEY = 'zyvo:guest-notes';
+const LAST_SAVED_NOTE_KEY = 'zyvo:last-saved-note';
 
 const readGuestNotes = (): NoteRecord[] => {
   try {
@@ -27,7 +28,17 @@ const readGuestNotes = (): NoteRecord[] => {
 };
 
 const writeGuestNotes = (notes: NoteRecord[]) => {
-  try { localStorage.setItem(GUEST_NOTES_KEY, JSON.stringify(notes)); } catch {}
+  try {
+    localStorage.setItem(GUEST_NOTES_KEY, JSON.stringify(notes));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const broadcastSavedNote = (note: NoteRecord) => {
+  try { localStorage.setItem(LAST_SAVED_NOTE_KEY, JSON.stringify(note)); } catch {}
+  window.dispatchEvent(new CustomEvent<NoteRecord>('zyvo:note-saved', { detail: note }));
 };
 
 export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMode; onClose: () => void }) {
@@ -51,18 +62,27 @@ export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMo
   const loadNotes = async () => {
     setBusy(true);
     setMessage('');
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setNotes(readGuestNotes().sort((a,b) => b.updated_at.localeCompare(a.updated_at)));
-      setBusy(false);
-      return;
+
+    const localNotes = readGuestNotes().sort((a,b) => b.updated_at.localeCompare(a.updated_at));
+    setNotes(localNotes);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) {
+        setBusy(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('notes')
+        .select('id,subject,body,created_at,updated_at')
+        .order('updated_at', { ascending: false });
+
+      if (!error && data) setNotes(data as NoteRecord[]);
+    } catch {
+      // Local notes remain available even if auth/network is unavailable.
     }
-    const { data, error } = await supabase
-      .from('notes')
-      .select('id,subject,body,created_at,updated_at')
-      .order('updated_at', { ascending: false });
-    if (error) setMessage('Não foi possível carregar suas anotações.');
-    else setNotes((data || []) as NoteRecord[]);
     setBusy(false);
   };
 
@@ -91,53 +111,59 @@ export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMo
       setMessage('Escreva um assunto ou texto antes de salvar.');
       return;
     }
+
     setBusy(true);
     setMessage('');
+
     const now = new Date().toISOString();
     const cleanSubject = subject.trim() || 'Sem assunto';
     const cleanBody = body.trim();
-    const { data: { user } } = await supabase.auth.getUser();
+    const current = readGuestNotes();
+    const existing = noteId ? current.find(note => note.id === noteId) : undefined;
 
-    let savedNote: NoteRecord;
+    const savedNote: NoteRecord = {
+      id: existing?.id || noteId || `guest-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+      subject: cleanSubject,
+      body: cleanBody,
+      created_at: existing?.created_at || now,
+      updated_at: now,
+    };
 
-    if (!user) {
-      const current = readGuestNotes();
-      const existing = noteId ? current.find(note => note.id === noteId) : undefined;
-      savedNote = {
-        id: existing?.id || `guest-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
-        subject: cleanSubject,
-        body: cleanBody,
-        created_at: existing?.created_at || now,
-        updated_at: now,
-      };
-      const next = existing
-        ? current.map(note => note.id === savedNote.id ? savedNote : note)
-        : [savedNote, ...current];
-      writeGuestNotes(next);
-    } else {
+    const next = existing
+      ? current.map(note => note.id === savedNote.id ? savedNote : note)
+      : [savedNote, ...current.filter(note => note.id !== savedNote.id)];
+
+    if (!writeGuestNotes(next)) {
+      setMessage('Não foi possível salvar a anotação neste navegador.');
+      setBusy(false);
+      return;
+    }
+
+    broadcastSavedNote(savedNote);
+    setBusy(false);
+    onClose();
+
+    // Cloud sync is optional and never blocks creating/saving the note locally.
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) return;
+
       const payload = {
         user_id: user.id,
         subject: cleanSubject,
         body: cleanBody,
         updated_at: now,
       };
-      const result = noteId
-        ? await supabase.from('notes').update(payload).eq('id', noteId).select('id,subject,body,created_at,updated_at').single()
-        : await supabase.from('notes').insert(payload).select('id,subject,body,created_at,updated_at').single();
-      if (result.error || !result.data) {
-        setMessage('Não foi possível salvar a anotação.');
-        setBusy(false);
-        return;
-      }
-      savedNote = result.data as NoteRecord;
-    }
 
-    try {
-      localStorage.setItem('zyvo:last-saved-note', JSON.stringify(savedNote));
-    } catch {}
-    window.dispatchEvent(new CustomEvent<NoteRecord>('zyvo:note-saved', { detail: savedNote }));
-    setBusy(false);
-    onClose();
+      if (noteId && !noteId.startsWith('guest-')) {
+        await supabase.from('notes').update(payload).eq('id', noteId);
+      } else {
+        await supabase.from('notes').insert(payload);
+      }
+    } catch {
+      // The local copy is already safe; cloud synchronization can happen later.
+    }
   };
 
   const openNote = (note: NoteRecord) => {
