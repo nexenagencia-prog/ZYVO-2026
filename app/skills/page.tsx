@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import {BarChart3,Bell,Check,ChevronRight,CircleHelp,Ear,FileText,Lightbulb,MessageCircle,Play,Search,ShieldCheck,Sparkles,SunMedium,Target,Users,AlertCircle} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
+import {SKILLS_IMAGE_DATA} from './skills-image-data';
 import '../refine.css';
 import '../cms-home.css';
 import '../home-overrides.css';
@@ -25,7 +26,7 @@ const moments=[
   {time:'31:10',title:'Decisão',text:'Alinhamento para próxima etapa.',pos:'58% 42%'},
 ];
 
-const skillsArtwork='https://raw.githubusercontent.com/nexenagencia-prog/ZYVO-APP/main/public/skills-bg-hero.webp';
+const skillsArtwork=SKILLS_IMAGE_DATA;
 
 export default function SkillsPage(){
   return <main className="app-shell skills-page">
