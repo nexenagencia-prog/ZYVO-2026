@@ -1,0 +1,26 @@
+.skills-page .skills-progress i{
+  transform-origin:left center;
+  transform:scaleX(0);
+  will-change:transform;
+  animation:skillsProgressLoad 2.35s cubic-bezier(.22,.72,.18,1) forwards;
+}
+
+.skills-page .skills-metric:nth-child(1) .skills-progress i{animation-delay:.12s}
+.skills-page .skills-metric:nth-child(2) .skills-progress i{animation-delay:.20s}
+.skills-page .skills-metric:nth-child(3) .skills-progress i{animation-delay:.28s}
+.skills-page .skills-metric:nth-child(4) .skills-progress i{animation-delay:.36s}
+.skills-page .skills-metric:nth-child(5) .skills-progress i{animation-delay:.44s}
+.skills-page .skills-metric:nth-child(6) .skills-progress i{animation-delay:.52s}
+.skills-page .skills-metric:nth-child(7) .skills-progress i{animation-delay:.60s}
+
+@keyframes skillsProgressLoad{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .skills-page .skills-progress i{
+    animation:none;
+    transform:scaleX(1);
+  }
+}
