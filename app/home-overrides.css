@@ -14,98 +14,48 @@ html body .hero-copy h1 span{
   opacity:1!important;
 }
 
-.eyebrow,.search-box span,.search-box kbd,.topnav a,.next-meeting span,.rating-line span,.hero-score,.info-card p,.avatar-meta>span,.side-item,.sidebar-toggle{
-  font-weight:300;
-}
-
-.topnav .current,.next-meeting strong,.name-edit strong{
-  font-weight:430;
-}
+.eyebrow,.search-box span,.search-box kbd,.topnav a,.next-meeting span,.rating-line span,.hero-score,.info-card p,.avatar-meta>span,.side-item,.sidebar-toggle{font-weight:300}
+.topnav .current,.next-meeting strong,.name-edit strong{font-weight:430}
 
 /* Refined card typography */
-html body .info-card h2{
-  font-weight:380!important;
-  letter-spacing:-.02em;
-}
-html body .info-card p{
-  font-weight:280!important;
-  letter-spacing:-.006em;
-  line-height:1.32;
-}
-html body .info-card>strong{
-  font-weight:380!important;
-}
+html body .info-card h2{font-weight:320!important;letter-spacing:-.018em}
+html body .info-card p{font-weight:280!important;letter-spacing:-.006em;line-height:1.32}
+html body .info-card>strong{font-weight:350!important}
 
 /* Thinner, smaller, more elegant Lucide icons in cards and sidebar. */
-html body .info-card .card-icon,
-html body .side-item svg,
-html body .sidebar-toggle svg{
-  stroke-width:1.35!important;
-  vector-effect:non-scaling-stroke;
-}
-html body .info-card .card-icon{
-  width:31px!important;
-  height:31px!important;
-}
-html body .side-item svg{
-  width:20px!important;
-  height:20px!important;
-}
-html body .sidebar-toggle svg{
-  width:18px!important;
-  height:18px!important;
-}
-html body .circled{
-  border-width:1.25px!important;
-}
+html body .info-card .card-icon,html body .side-item svg,html body .sidebar-toggle svg{stroke-width:1.35!important;vector-effect:non-scaling-stroke}
+html body .info-card .card-icon{width:31px!important;height:31px!important}
+html body .side-item svg{width:20px!important;height:20px!important}
+html body .sidebar-toggle svg{width:18px!important;height:18px!important}
+html body .circled{border-width:1.25px!important}
 
-.feature-text{font-weight:380}
-.primary-btn,.secondary-btn{font-weight:380}
-.secondary-btn{font-weight:430}
-
-.hero-score{font-size:16px}
-.hero-score b{font-size:21px;font-weight:430}
-
+.feature-text{font-weight:380}.primary-btn,.secondary-btn{font-weight:380}.secondary-btn{font-weight:430}
+.hero-score{font-size:16px}.hero-score b{font-size:21px;font-weight:430}
 .search-box{transform:translateY(-12px)}
 
-/* Progress treatment matched to the supplied reference: slim frosted rail, luminous white fill. */
-html body .hero-copy .progress{
-  width:460px;
-  height:11px;
-  margin-top:10px;
+/* Shared premium progress treatment: hero + all cards. */
+html body .hero-copy .progress,
+html body .info-card .card-progress{
   border-radius:999px;
   overflow:hidden;
   background:rgba(118,137,151,.28);
   box-shadow:inset 0 1px 2px rgba(86,105,119,.12),0 1px 0 rgba(255,255,255,.28);
 }
-html body .hero-copy .progress i{
+html body .hero-copy .progress{width:460px;height:11px;margin-top:10px}
+html body .info-card .card-progress{height:8px}
+html body .hero-copy .progress i,
+html body .info-card .card-progress i{
   display:block;
   height:100%;
   border-radius:999px;
-  background:linear-gradient(90deg,rgba(255,255,255,.96),#fff);
-  box-shadow:0 0 5px rgba(255,255,255,.9),0 0 13px rgba(255,255,255,.7);
-}
-/* Small, delicate markers under the progress rail. */
-html body .hero-copy .ticks{
-  width:460px;
-  height:12px;
-  margin-top:7px;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.92) 0 1px,transparent 1px 44px);
-  background-size:auto 6px;
-  background-repeat:repeat-x;
-  background-position:left top;
-  opacity:.72;
-  mask:none;
-  -webkit-mask:none;
+  background:linear-gradient(90deg,rgba(255,255,255,.96),#fff)!important;
+  box-shadow:0 0 5px rgba(255,255,255,.9),0 0 13px rgba(255,255,255,.7)!important;
 }
 
-/* Remove decorative dots from the top-right of cards. */
+/* Small, delicate markers under the hero progress rail. */
+html body .hero-copy .ticks{width:460px;height:12px;margin-top:7px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.92) 0 1px,transparent 1px 44px);background-size:auto 6px;background-repeat:repeat-x;background-position:left top;opacity:.72;mask:none;-webkit-mask:none}
+
 .card-dot,.feature-dot{display:none!important}
-
-/* The only expand/collapse control is inside the sidebar. */
 .menu-top{display:none!important}
 
-@media(max-width:1450px){
-  .search-box{transform:translateY(-10px)}
-  html body .hero-copy .progress,html body .hero-copy .ticks{width:420px}
-}
+@media(max-width:1450px){.search-box{transform:translateY(-10px)}html body .hero-copy .progress,html body .hero-copy .ticks{width:420px}}
