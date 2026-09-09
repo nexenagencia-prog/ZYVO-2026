@@ -2,14 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-test('notes page uses an infinite carousel with a highlighted center card',()=>{
+test('notes carousel physically follows pointer drag',()=>{
   const page=fs.readFileSync('app/anotacoes/page.tsx','utf8');
-  assert.match(page,/notes-carousel/);
-  assert.match(page,/activeIndex/);
-  assert.match(page,/carouselCards/);
+  assert.match(page,/onPointerDown/);
+  assert.match(page,/onPointerMove/);
+  assert.match(page,/onPointerUp/);
+  assert.match(page,/dragX/);
+  assert.match(page,/setPointerCapture/);
 });
 
-test('notes page keeps the ZYVO sidebar visible',()=>{
-  const page=fs.readFileSync('app/anotacoes/page.tsx','utf8');
-  assert.match(page,/AppSidebar/);
+test('shared sidebar preserves hero profile avatar and original menu actions',()=>{
+  const sidebar=fs.readFileSync('app/AppSidebar.tsx','utf8');
+  assert.match(sidebar,/zyvo-profile-avatar/);
+  assert.match(sidebar,/Camera/);
+  assert.match(sidebar,/Calculadora/);
+  assert.match(sidebar,/Anotar/);
+  assert.match(sidebar,/Anotações/);
 });
