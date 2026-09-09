@@ -15,6 +15,21 @@ type NoteRecord = {
   updated_at: string;
 };
 
+const GUEST_NOTES_KEY = 'zyvo:guest-notes';
+
+const readGuestNotes = (): NoteRecord[] => {
+  try {
+    const raw = localStorage.getItem(GUEST_NOTES_KEY);
+    return raw ? JSON.parse(raw) as NoteRecord[] : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeGuestNotes = (notes: NoteRecord[]) => {
+  try { localStorage.setItem(GUEST_NOTES_KEY, JSON.stringify(notes)); } catch {}
+};
+
 export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMode; onClose: () => void }) {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const [view, setView] = useState<'editor' | 'library'>('editor');
@@ -38,8 +53,7 @@ export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMo
     setMessage('');
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      setNotes([]);
-      setMessage('Entre na sua conta para acessar suas anotações.');
+      setNotes(readGuestNotes().sort((a,b) => b.updated_at.localeCompare(a.updated_at)));
       setBusy(false);
       return;
     }
@@ -79,27 +93,45 @@ export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMo
     }
     setBusy(true);
     setMessage('');
+    const now = new Date().toISOString();
+    const cleanSubject = subject.trim() || 'Sem assunto';
+    const cleanBody = body.trim();
     const { data: { user } } = await supabase.auth.getUser();
+
+    let savedNote: NoteRecord;
+
     if (!user) {
-      setMessage('Entre na sua conta para salvar a anotação.');
-      setBusy(false);
-      return;
+      const current = readGuestNotes();
+      const existing = noteId ? current.find(note => note.id === noteId) : undefined;
+      savedNote = {
+        id: existing?.id || `guest-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+        subject: cleanSubject,
+        body: cleanBody,
+        created_at: existing?.created_at || now,
+        updated_at: now,
+      };
+      const next = existing
+        ? current.map(note => note.id === savedNote.id ? savedNote : note)
+        : [savedNote, ...current];
+      writeGuestNotes(next);
+    } else {
+      const payload = {
+        user_id: user.id,
+        subject: cleanSubject,
+        body: cleanBody,
+        updated_at: now,
+      };
+      const result = noteId
+        ? await supabase.from('notes').update(payload).eq('id', noteId).select('id,subject,body,created_at,updated_at').single()
+        : await supabase.from('notes').insert(payload).select('id,subject,body,created_at,updated_at').single();
+      if (result.error || !result.data) {
+        setMessage('Não foi possível salvar a anotação.');
+        setBusy(false);
+        return;
+      }
+      savedNote = result.data as NoteRecord;
     }
-    const payload = {
-      user_id: user.id,
-      subject: subject.trim() || 'Sem assunto',
-      body: body.trim(),
-      updated_at: new Date().toISOString(),
-    };
-    const result = noteId
-      ? await supabase.from('notes').update(payload).eq('id', noteId).select('id,subject,body,created_at,updated_at').single()
-      : await supabase.from('notes').insert(payload).select('id,subject,body,created_at,updated_at').single();
-    if (result.error || !result.data) {
-      setMessage('Não foi possível salvar a anotação.');
-      setBusy(false);
-      return;
-    }
-    const savedNote = result.data as NoteRecord;
+
     try {
       localStorage.setItem('zyvo:last-saved-note', JSON.stringify(savedNote));
     } catch {}
