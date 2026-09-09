@@ -1,6 +1,7 @@
 import './globals.css';
 import './logo.css';
 import type { Metadata } from 'next';
+import FloatingAIChat from './FloatingAIChat';
 
 export const metadata: Metadata = {
   title: 'ZYVO — Videoconferência de alta performance',
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingAIChat />
+      </body>
     </html>
   );
 }
