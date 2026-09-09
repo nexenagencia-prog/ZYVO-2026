@@ -18,8 +18,45 @@ html body .hero-copy h1 span{
   font-weight:300;
 }
 
-.topnav .current,.next-meeting strong,.name-edit strong,.info-card h2{
+.topnav .current,.next-meeting strong,.name-edit strong{
   font-weight:430;
+}
+
+/* Refined card typography */
+html body .info-card h2{
+  font-weight:380!important;
+  letter-spacing:-.02em;
+}
+html body .info-card p{
+  font-weight:280!important;
+  letter-spacing:-.006em;
+  line-height:1.32;
+}
+html body .info-card>strong{
+  font-weight:380!important;
+}
+
+/* Thinner, smaller, more elegant Lucide icons in cards and sidebar. */
+html body .info-card .card-icon,
+html body .side-item svg,
+html body .sidebar-toggle svg{
+  stroke-width:1.35!important;
+  vector-effect:non-scaling-stroke;
+}
+html body .info-card .card-icon{
+  width:31px!important;
+  height:31px!important;
+}
+html body .side-item svg{
+  width:20px!important;
+  height:20px!important;
+}
+html body .sidebar-toggle svg{
+  width:18px!important;
+  height:18px!important;
+}
+html body .circled{
+  border-width:1.25px!important;
 }
 
 .feature-text{font-weight:380}
