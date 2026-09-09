@@ -9,6 +9,7 @@ import '../cms-home.css';
 import '../home-overrides.css';
 import './skills.css';
 import './skills-fix.css';
+import './skills-progress-motion.css';
 
 const metrics=[
   {label:'Comunicação',value:88,Icon:MessageCircle},
