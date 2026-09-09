@@ -13,7 +13,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
     secondaryButton: 'Entrar',
     imageUrl: ''
   },
-  nextMeeting: { label: 'Seu próximo encontro', dateTime: '14:00 — 30 Set 2026' },
+  nextMeeting: { label: 'Sua próxima Reunião', dateTime: '14:00 — 30 Set 2026' },
   profile: { name: 'Sandro Bello', avatarUrl: '', planLabel: 'ZYVO Pro' },
   navigation: {
     searchPlaceholder: 'Buscar reunião, pessoa ou gravação...',
