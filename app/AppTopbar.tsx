@@ -13,7 +13,7 @@ export default function AppTopbar(){
   const router=useRouter();
   useEffect(()=>{if(pathname!=='/')router.prefetch('/')},[pathname,router]);
   return <header className="shared-topbar">
-    <Link className="shared-brand" href="/" prefetch={true} aria-label="ZYVO"><span>Z</span><b>ZYVO</b></Link>
+    <Link className="shared-brand" href="/" prefetch={true} aria-label="ZYVO"><img src="/zyvo-logo.svg" alt="ZYVO" /></Link>
     <div className="shared-search"><Search/><span>Buscar reunião, pessoa ou gravação...</span><kbd>⌘ K</kbd></div>
     <nav>{nav.map(([label,href])=><Link key={href} href={href} prefetch={true} className={pathname===href?'active':''}>{label}</Link>)}</nav>
     <div className="shared-next"><span>Sua próxima Reunião</span><strong>14:00 — 30 Set 2026</strong></div>
