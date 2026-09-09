@@ -92,16 +92,20 @@ export default function FloatingNotes({ mode, onClose }: { mode: FloatingNotesMo
       updated_at: new Date().toISOString(),
     };
     const result = noteId
-      ? await supabase.from('notes').update(payload).eq('id', noteId).select('id').single()
-      : await supabase.from('notes').insert(payload).select('id').single();
-    if (result.error) {
+      ? await supabase.from('notes').update(payload).eq('id', noteId).select('id,subject,body,created_at,updated_at').single()
+      : await supabase.from('notes').insert(payload).select('id,subject,body,created_at,updated_at').single();
+    if (result.error || !result.data) {
       setMessage('Não foi possível salvar a anotação.');
       setBusy(false);
       return;
     }
-    setMessage('Anotação salva.');
-    setView('library');
-    await loadNotes();
+    const savedNote = result.data as NoteRecord;
+    try {
+      localStorage.setItem('zyvo:last-saved-note', JSON.stringify(savedNote));
+    } catch {}
+    window.dispatchEvent(new CustomEvent<NoteRecord>('zyvo:note-saved', { detail: savedNote }));
+    setBusy(false);
+    onClose();
   };
 
   const openNote = (note: NoteRecord) => {
