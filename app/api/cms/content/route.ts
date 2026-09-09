@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '../../../../lib/supabase/server';
 import { isAdminEmail } from '../../../../lib/cms/auth.mjs';
@@ -49,5 +50,7 @@ export async function PUT(request:Request){
     if(result.error) return NextResponse.json({error:'Não foi possível salvar o carrossel.'},{status:500});
   }
 
+  revalidateTag('zyvo-home-content');
+  revalidatePath('/');
   return NextResponse.json({ok:true,content:await loadHomeContent()});
 }
