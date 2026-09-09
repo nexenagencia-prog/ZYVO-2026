@@ -1,10 +1,12 @@
 'use client';
 
-import { ArrowRight, FileText, Pencil, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft,ArrowRight,FileText,Pencil,Trash2 } from 'lucide-react';
+import { useEffect,useMemo,useState } from 'react';
 import AppTopbar from '../AppTopbar';
+import AppSidebar from '../AppSidebar';
 import { createBrowserSupabaseClient } from '../../lib/supabase/client';
 import '../app-topbar.css';
+import '../app-sidebar.css';
 import './notes-page.css';
 
 type Note={id:string;subject:string;body:string;created_at:string;updated_at:string;demo?:boolean};
@@ -15,8 +17,8 @@ const demos:Note[]=[
 ];
 const fmt=(date:string)=>new Date(date).toLocaleString('pt-BR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',',' •');
 export default function AnotacoesPage(){
- const supabase=useMemo(()=>createBrowserSupabaseClient(),[]);const[notes,setNotes]=useState<Note[]>([]);const[loading,setLoading]=useState(true);
+ const supabase=useMemo(()=>createBrowserSupabaseClient(),[]);const[notes,setNotes]=useState<Note[]>([]);const[loading,setLoading]=useState(true);const[activeIndex,setActiveIndex]=useState(0);
  useEffect(()=>{let alive=true;(async()=>{const{data:{user}}=await supabase.auth.getUser();if(!user){if(alive)setLoading(false);return}const{data}=await supabase.from('notes').select('id,subject,body,created_at,updated_at').order('updated_at',{ascending:false});if(alive){setNotes((data||[]) as Note[]);setLoading(false)}})();return()=>{alive=false}},[supabase]);
- const cards=[...notes,...demos];
- return <><AppTopbar/><main className="notes-page"><section className="notes-shell"><div className="notes-heading"><div><span>ANOTAÇÕES</span><h1>Suas ideias, <em>sempre à mão.</em></h1><p>Registros de reuniões, decisões e próximos passos em um só lugar.</p></div><div className="notes-count">{loading?'…':cards.length}<small>anotações</small></div></div><div className="notes-grid">{cards.map((note,index)=><article className="saved-note-card" key={note.id}><div className="saved-note-top"><div className="saved-note-icon"><FileText/></div><div className="saved-note-actions"><button aria-label="Editar"><Pencil/></button><button aria-label="Excluir" disabled={note.demo}><Trash2/></button></div></div><span className="saved-note-label">Anotação</span><h2>{note.subject}</h2><time>{fmt(note.updated_at)}</time><p>{note.body}</p><div className="saved-note-bottom"><button>Ver anotação <ArrowRight/></button><div className={`note-bars bars-${index%3}`}><i/><i/><i/><i/></div></div></article>)}</div></section></main></>;
+ const cards=[...notes,...demos];const carouselCards=cards.length?cards: demos;const count=carouselCards.length;const move=(direction:number)=>setActiveIndex(i=>(i+direction+count)%count);const visible=[-2,-1,0,1,2].map(offset=>({note:carouselCards[(activeIndex+offset+count)%count],offset}));
+ return <><AppSidebar/><AppTopbar/><main className="notes-page"><section className="notes-shell"><div className="notes-heading"><div><span>ANOTAÇÕES</span><h1>Suas ideias, <em>sempre à mão.</em></h1><p>Registros de reuniões, decisões e próximos passos em um só lugar.</p></div><div className="notes-count">{loading?'…':cards.length}<small>anotações</small></div></div><div className="notes-carousel" aria-label="Carrossel de anotações"><button className="notes-carousel-arrow left" onClick={()=>move(-1)} aria-label="Anterior"><ArrowLeft/></button><div className="notes-carousel-stage">{visible.map(({note,offset})=><article className={`saved-note-card ${offset===0?'is-active':''} offset-${offset<0?'m'+Math.abs(offset):offset}`} key={`${note.id}-${offset}`} onClick={()=>offset!==0&&setActiveIndex(i=>(i+offset+count)%count)}><div className="saved-note-top"><div className="saved-note-icon"><FileText/></div><div className="saved-note-actions"><button aria-label="Editar"><Pencil/></button><button aria-label="Excluir" disabled={note.demo}><Trash2/></button></div></div><span className="saved-note-label">Anotação</span><h2>{note.subject}</h2><time>{fmt(note.updated_at)}</time><p>{note.body}</p><div className="saved-note-bottom"><button>Ver anotação <ArrowRight/></button><div className={`note-bars bars-${Math.abs(offset)%3}`}><i/><i/><i/><i/></div></div></article>)}</div><button className="notes-carousel-arrow right" onClick={()=>move(1)} aria-label="Próxima"><ArrowRight/></button></div><div className="notes-carousel-dots">{carouselCards.map((note,i)=><button key={note.id} className={i===activeIndex?'active':''} onClick={()=>setActiveIndex(i)} aria-label={`Anotação ${i+1}`}/>)}</div></section></main></>;
 }
