@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Bell, Search } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import './app-topbar.css';
 
 const nav=[['Início','/'],['Skills','/skills'],['Agenda','/agenda'],['Planos e Preços','/planos']] as const;
 
