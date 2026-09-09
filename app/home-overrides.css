@@ -5,7 +5,16 @@ html body .hero-copy h1,html body .hero-copy h1 span{font-weight:430;background:
 html body .info-card h2{font-weight:320!important;letter-spacing:-.018em}html body .info-card p{font-weight:280!important;letter-spacing:-.006em;line-height:1.32}html body .info-card>strong{font-weight:350!important}
 html body .info-card .card-icon,html body .side-item svg,html body .sidebar-toggle svg{stroke-width:1.35!important;vector-effect:non-scaling-stroke}html body .info-card .card-icon{width:31px!important;height:31px!important}html body .side-item svg{width:18px!important;height:18px!important}html body .sidebar-toggle svg{width:18px!important;height:18px!important}html body .circled{border-width:1.25px!important}
 html body .side-nav{flex:1;justify-content:flex-start!important;gap:5px!important;margin-top:4px!important;overflow:hidden}html body .side-item{height:34px!important;min-height:34px!important;font-size:12px!important}html body .sidebar.expanded .side-item{padding:0 12px!important}
-.feature-text{font-weight:380}.primary-btn,.secondary-btn{font-weight:380}.secondary-btn{font-weight:430}.hero-score{font-size:16px}.hero-score b{font-size:21px;font-weight:430}.search-box{transform:translateY(-12px)}
+.feature-text{font-weight:380}.hero-score{font-size:16px}.hero-score b{font-size:21px;font-weight:430}.search-box{transform:translateY(-12px)}
+
+/* Smaller, lighter hero actions. */
+html body .hero-actions{gap:12px!important;margin-top:12px!important}
+html body .primary-btn,html body .secondary-btn{height:52px!important;border-radius:26px!important;padding:0 20px!important;font-size:14px!important;font-weight:300!important;letter-spacing:-.006em!important;gap:12px!important;min-width:0!important}
+html body .primary-btn{min-width:190px!important}
+html body .secondary-btn{min-width:150px!important;background:rgba(255,255,255,.22)!important;border:1px solid rgba(255,255,255,.62)!important;color:#0b0d0f!important;backdrop-filter:blur(22px) saturate(125%)!important;-webkit-backdrop-filter:blur(22px) saturate(125%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 8px 24px rgba(62,79,91,.12)!important}
+html body .secondary-btn:hover{background:rgba(255,255,255,.3)!important}
+html body .primary-btn svg,html body .secondary-btn svg{width:18px!important;height:18px!important;stroke-width:1.35!important}
+
 html body .hero-copy .progress,html body .info-card .card-progress{border-radius:999px;overflow:hidden;background:rgba(118,137,151,.28);box-shadow:inset 0 1px 2px rgba(86,105,119,.12),0 1px 0 rgba(255,255,255,.28)}html body .hero-copy .progress{width:460px;height:11px;margin-top:10px}html body .info-card .card-progress{height:8px}html body .hero-copy .progress i,html body .info-card .card-progress i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.96),#fff)!important;box-shadow:0 0 5px rgba(255,255,255,.9),0 0 13px rgba(255,255,255,.7)!important}html body .hero-copy .ticks{width:460px;height:12px;margin-top:7px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.92) 0 1px,transparent 1px 44px);background-size:auto 6px;background-repeat:repeat-x;background-position:left top;opacity:.72;mask:none;-webkit-mask:none}
 .card-dot,.feature-dot{display:none!important}.menu-top{display:none!important}
 
