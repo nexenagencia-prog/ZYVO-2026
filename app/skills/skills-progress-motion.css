@@ -1,3 +1,9 @@
+@property --skills-score{
+  syntax:'<percentage>';
+  inherits:false;
+  initial-value:0%;
+}
+
 .skills-page .skills-progress i{
   transform-origin:left center;
   transform:scaleX(0);
@@ -13,14 +19,40 @@
 .skills-page .skills-metric:nth-child(6) .skills-progress i{animation-delay:.52s}
 .skills-page .skills-metric:nth-child(7) .skills-progress i{animation-delay:.60s}
 
+/* Main Skills score: animate the circular progress from 0 to 86 on page entry. */
+.skills-page .skills-ring{
+  --skills-score:0%;
+  background:conic-gradient(from -90deg,#0c111a 0 var(--skills-score),rgba(255,255,255,.92) var(--skills-score) 100%)!important;
+  animation:skillsRingLoad 2.7s cubic-bezier(.22,.72,.18,1) .16s forwards;
+  will-change:background;
+}
+
+.skills-page .skills-ring:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  pointer-events:none;
+  box-shadow:0 0 18px 5px rgba(255,255,255,.62),inset 0 0 18px rgba(255,255,255,.2);
+}
+
 @keyframes skillsProgressLoad{
   from{transform:scaleX(0)}
   to{transform:scaleX(1)}
+}
+
+@keyframes skillsRingLoad{
+  from{--skills-score:0%}
+  to{--skills-score:86%}
 }
 
 @media(prefers-reduced-motion:reduce){
   .skills-page .skills-progress i{
     animation:none;
     transform:scaleX(1);
+  }
+  .skills-page .skills-ring{
+    animation:none;
+    --skills-score:86%;
   }
 }
