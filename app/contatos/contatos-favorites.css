@@ -1,0 +1,45 @@
+.contacts-page{
+  background:
+    radial-gradient(circle at 14% 7%,rgba(255,255,255,.98) 0 8%,rgba(235,244,252,.9) 24%,transparent 45%),
+    radial-gradient(circle at 86% 10%,rgba(89,116,145,.82) 0 14%,rgba(126,151,176,.5) 34%,transparent 56%),
+    radial-gradient(circle at 54% 66%,rgba(255,255,255,.92) 0 14%,rgba(219,233,246,.68) 35%,transparent 58%),
+    radial-gradient(circle at 84% 88%,rgba(101,129,157,.56) 0 18%,rgba(151,174,196,.35) 36%,transparent 58%),
+    linear-gradient(135deg,#eaf3fb 0%,#d9e7f3 36%,#c6d6e5 64%,#dce7f1 100%) !important;
+}
+.contacts-page:before{
+  content:"";
+  position:absolute;
+  inset:-10%;
+  pointer-events:none;
+  background:
+    linear-gradient(34deg,transparent 0 37%,rgba(255,255,255,.76) 43%,rgba(255,255,255,.22) 48%,transparent 55%),
+    linear-gradient(118deg,transparent 0 30%,rgba(255,255,255,.44) 35%,rgba(255,255,255,.08) 41%,transparent 48%);
+  filter:blur(24px);
+  opacity:.92;
+}
+.contacts-content,.contacts-page>aside,.contacts-page>header{position:relative;z-index:1}
+.contact-card{background:rgba(255,255,255,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.favorite-toggle{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:25px;
+  height:25px;
+  border:0;
+  border-radius:50%;
+  padding:0;
+  display:grid;
+  place-items:center;
+  color:#6f7f90;
+  background:rgba(255,255,255,.48);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  cursor:pointer;
+  z-index:3;
+  transition:transform .18s ease,color .18s ease,background .18s ease;
+}
+.favorite-toggle:hover{transform:scale(1.08);background:rgba(255,255,255,.72)}
+.favorite-toggle svg{width:13px;height:13px;stroke-width:1.45}
+.favorite-toggle.is-favorite{color:#182333;background:rgba(255,255,255,.8)}
+.favorite-toggle.is-favorite svg{fill:currentColor}
+.pill{cursor:pointer}
