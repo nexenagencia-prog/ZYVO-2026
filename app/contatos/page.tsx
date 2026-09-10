@@ -22,7 +22,6 @@ export default function ContatosPage(){
    <AppTopbar/>
    <section className="contacts-content">
      <div className="contacts-inner">
-       <div className="contacts-kicker">CONTATOS</div>
        <h1>Conexões<br/>para reuniões de <span>alto nível.</span></h1>
        <p className="contacts-sub">Organize, convide e colabore.</p>
        <div className="contacts-toolbar">
