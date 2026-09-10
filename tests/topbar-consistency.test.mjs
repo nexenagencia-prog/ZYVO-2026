@@ -21,3 +21,9 @@ test('AppTopbar preserves the Hero topbar structure and class names',async()=>{
     assert.ok(topbar.includes(className),`missing Hero class ${className}`);
   }
 });
+
+test('Contacts keeps the shared topbar above page content so links remain clickable',async()=>{
+  const css=await read('app/contatos/contatos-favorites.css');
+  assert.doesNotMatch(css,/\.contacts-content,.contacts-page>aside,.contacts-page>header\{position:relative;z-index:1\}/);
+  assert.match(css,/\.contacts-page>header\.app-topbar\{[^}]*z-index:80/);
+});
