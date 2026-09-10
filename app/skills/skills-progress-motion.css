@@ -19,7 +19,6 @@
 .skills-page .skills-metric:nth-child(6) .skills-progress i{animation-delay:.52s}
 .skills-page .skills-metric:nth-child(7) .skills-progress i{animation-delay:.60s}
 
-/* Main Skills score: animate the circular progress from 0 to 86 on page entry. */
 .skills-page .skills-ring{
   --skills-score:0%;
   background:conic-gradient(from -90deg,#0c111a 0 var(--skills-score),rgba(255,255,255,.92) var(--skills-score) 100%)!important;
@@ -34,6 +33,79 @@
   border-radius:50%;
   pointer-events:none;
   box-shadow:0 0 18px 5px rgba(255,255,255,.62),inset 0 0 18px rgba(255,255,255,.2);
+}
+
+/* Próximas ações: mantém o visual atual e apresenta as três ações solicitadas. */
+.skills-page .skills-bottom-grid .skills-detail-card:last-child{
+  position:relative;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child header{
+  margin-bottom:48px;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child header:after{
+  content:'Enviar proposta';
+  position:absolute;
+  left:18px;
+  right:18px;
+  top:54px;
+  min-height:38px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  padding:0 14px 0 42px;
+  border:1px solid rgba(255,255,255,.58);
+  border-radius:13px;
+  background:rgba(255,255,255,.32);
+  color:#172235;
+  font-size:12px;
+  font-weight:500;
+  box-shadow:inset 0 1px rgba(255,255,255,.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child header:before{
+  content:'✓';
+  position:absolute;
+  z-index:2;
+  left:30px;
+  top:64px;
+  width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(68,84,98,.18);
+  border-radius:6px;
+  background:rgba(255,255,255,.72);
+  color:#6d7b87;
+  font-size:10px;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) strong{
+  font-size:0;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) strong:after{
+  content:'Revisar contrato';
+  font-size:12px;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) p{
+  font-size:0;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) p:after{
+  content:'Antes de enviar';
+  font-size:10px;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) strong{
+  font-size:0;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) strong:after{
+  content:'Agendar nova reunião';
+  font-size:12px;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) p{
+  font-size:0;
+}
+.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) p:after{
+  content:'Próximo passo';
+  font-size:10px;
 }
 
 @keyframes skillsProgressLoad{
