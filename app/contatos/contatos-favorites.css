@@ -31,7 +31,8 @@
   filter:blur(22px);
   opacity:.62;
 }
-.contacts-content,.contacts-page>aside,.contacts-page>header{position:relative;z-index:1}
+.contacts-content,.contacts-page>aside{position:relative;z-index:1}
+.contacts-page>header.app-topbar{z-index:80}
 .contact-card{background:rgba(255,255,255,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .favorite-toggle{
   position:absolute;
