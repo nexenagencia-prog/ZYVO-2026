@@ -5,6 +5,7 @@ import {ChevronDown,MoreHorizontal,Plus,SlidersHorizontal,Star,Video} from 'luci
 import AppSidebar from '../AppSidebar';
 import AppTopbar from '../AppTopbar';
 import './contatos.css';
+import './contatos-favorites.css';
 
 const contacts=[
  {name:'Juliana',role:'Marketing',online:true,img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=85'},
