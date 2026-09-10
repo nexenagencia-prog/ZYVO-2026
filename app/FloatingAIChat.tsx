@@ -11,7 +11,7 @@ type ChatMessage = {
 
 const welcome: ChatMessage = {
   role: 'assistant',
-  content: 'Sou o Zybos. Posso te ajudar com negócios, vendas, persuasão, estratégia, marketing, gestão e decisões comerciais. O que você quer resolver agora?'
+  content: 'Sou a ZYVO. Posso te ajudar com negócios, vendas, persuasão, estratégia, marketing, gestão e decisões comerciais. O que você quer resolver agora?'
 };
 
 export default function FloatingAIChat(){
@@ -74,14 +74,14 @@ export default function FloatingAIChat(){
 
   return (
     <>
-      {open&&<button className="zybos-backdrop" aria-label="Fechar Zybos" onClick={()=>setOpen(false)} />}
+      {open&&<button className="zybos-backdrop" aria-label="Fechar ZYVO" onClick={()=>setOpen(false)} />}
 
-      <section className={`zybos-panel${open?' is-open':''}`} aria-hidden={!open} aria-label="Zybos — inteligência de negócios">
+      <section className={`zybos-panel${open?' is-open':''}`} aria-hidden={!open} aria-label="ZYVO — inteligência de negócios">
         <header className="zybos-header">
           <div className="zybos-brand">
             <img src="/zyvo-chat-icon.webp" alt="" aria-hidden="true" />
             <div>
-              <strong>Zybos</strong>
+              <strong>ZYVO</strong>
               <span><i /> Inteligência de negócios</span>
             </div>
           </div>
@@ -115,17 +115,17 @@ export default function FloatingAIChat(){
             onKeyDown={onKeyDown}
             rows={1}
             maxLength={5000}
-            placeholder="Pergunte qualquer coisa ao Zybos..."
-            aria-label="Mensagem para o Zybos"
+            placeholder="Pergunte qualquer coisa à ZYVO..."
+            aria-label="Mensagem para a ZYVO"
           />
           <button type="submit" disabled={!input.trim()||loading} aria-label="Enviar mensagem">
             <ArrowUp size={18}/>
           </button>
         </form>
-        <p className="zybos-hint">Zybos pode cometer erros. Revise informações importantes.</p>
+        <p className="zybos-hint">A ZYVO pode cometer erros. Revise informações importantes.</p>
       </section>
 
-      <button className={`zyvo-ai-chat${open?' is-open':''}`} type="button" aria-label={open?'Fechar Zybos':'Abrir Zybos'} onClick={()=>setOpen(v=>!v)}>
+      <button className={`zyvo-ai-chat${open?' is-open':''}`} type="button" aria-label={open?'Fechar ZYVO':'Abrir ZYVO'} onClick={()=>setOpen(v=>!v)}>
         <img src="/zyvo-chat-icon.webp" alt="" aria-hidden="true" />
         <span className="zyvo-ai-chat-dot" aria-hidden="true" />
       </button>
