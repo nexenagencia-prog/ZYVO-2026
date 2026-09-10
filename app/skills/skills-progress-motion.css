@@ -19,19 +19,21 @@
 .skills-page .skills-metric:nth-child(6) .skills-progress i{animation-delay:.52s}
 .skills-page .skills-metric:nth-child(7) .skills-progress i{animation-delay:.60s}
 
-/* Seu desempenho: progresso perfeitamente circular, sem pontas retas. */
+/* Seu desempenho: mesmo efeito luminoso branco/azulado da análise, sem marcador. */
 .skills-page .skills-ring{
   --skills-angle:0deg;
   --skills-ring-size:min(15vw,190px);
   width:var(--skills-ring-size)!important;
-  background:conic-gradient(from -90deg,#0c111a 0deg var(--skills-angle),rgba(255,255,255,.92) var(--skills-angle) 360deg)!important;
+  background:conic-gradient(from -90deg,#ffffff 0deg var(--skills-angle),rgba(236,247,255,.42) var(--skills-angle) 360deg)!important;
+  box-shadow:0 0 18px rgba(255,255,255,.95),0 0 42px rgba(214,239,255,.72),0 18px 42px rgba(55,86,110,.10)!important;
   animation:skillsRingLoad 2.7s cubic-bezier(.22,.72,.18,1) .16s forwards;
   will-change:background;
   overflow:visible;
 }
 
-/* Tampa arredondada do início do arco. */
-.skills-page .skills-ring:before{
+/* Extremidades suaves e arredondadas, integradas ao próprio arco. */
+.skills-page .skills-ring:before,
+.skills-page .skills-ring:after{
   content:""!important;
   position:absolute!important;
   left:50%!important;
@@ -41,33 +43,23 @@
   inset:auto!important;
   margin:-5px 0 0 -5px!important;
   border-radius:50%!important;
-  background:#0c111a!important;
-  box-shadow:0 0 18px 5px rgba(255,255,255,.35)!important;
-  transform:rotate(-90deg) translateX(calc(var(--skills-ring-size)/2 - 5px))!important;
-  transform-origin:center!important;
-  pointer-events:none;
-  z-index:3;
+  background:#fff!important;
+  box-shadow:0 0 10px rgba(255,255,255,.98),0 0 18px rgba(215,240,255,.9)!important;
+  pointer-events:none!important;
+  z-index:3!important;
 }
 
-/* Tampa arredondada acompanha o fim do progresso durante a animação. */
+.skills-page .skills-ring:before{
+  transform:rotate(-90deg) translateX(calc(var(--skills-ring-size)/2 - 5px))!important;
+  transform-origin:center!important;
+}
+
 .skills-page .skills-ring:after{
-  content:""!important;
-  position:absolute!important;
-  left:50%!important;
-  top:50%!important;
   right:auto!important;
   bottom:auto!important;
-  width:10px!important;
-  height:10px!important;
-  margin:-5px 0 0 -5px!important;
-  border-radius:50%!important;
-  background:#0c111a!important;
   filter:none!important;
-  box-shadow:0 0 10px rgba(12,17,26,.14)!important;
   transform:rotate(calc(-90deg + var(--skills-angle))) translateX(calc(var(--skills-ring-size)/2 - 5px))!important;
   transform-origin:center!important;
-  pointer-events:none;
-  z-index:3;
 }
 
 @keyframes skillsProgressLoad{
