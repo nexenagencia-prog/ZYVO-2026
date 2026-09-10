@@ -25,5 +25,11 @@ test('AppTopbar preserves the Hero topbar structure and class names',async()=>{
 test('Contacts keeps the shared topbar above page content so links remain clickable',async()=>{
   const css=await read('app/contatos/contatos-favorites.css');
   assert.doesNotMatch(css,/\.contacts-content,.contacts-page>aside,.contacts-page>header\{position:relative;z-index:1\}/);
-  assert.match(css,/\.contacts-page>header\.app-topbar\{[^}]*z-index:80/);
+  assert.match(css,/\.contacts-page>header\.app-topbar\{[^}]*z-index:9999!important/s);
+});
+
+test('Contacts search cannot overlap or intercept the top navigation',async()=>{
+  const css=await read('app/contatos/contatos-favorites.css');
+  assert.match(css,/\.contacts-page>header\.app-topbar \.search-box\{[^}]*width:420px!important;[^}]*max-width:420px!important;[^}]*pointer-events:none!important/s);
+  assert.match(css,/\.contacts-page>header\.app-topbar \.topnav\{[^}]*position:relative!important;[^}]*z-index:10001!important;[^}]*pointer-events:auto!important/s);
 });
