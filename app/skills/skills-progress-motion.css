@@ -10,6 +10,7 @@
   will-change:transform;
   animation:skillsProgressLoad 2.35s cubic-bezier(.22,.72,.18,1) forwards;
 }
+
 .skills-page .skills-metric:nth-child(1) .skills-progress i{animation-delay:.12s}
 .skills-page .skills-metric:nth-child(2) .skills-progress i{animation-delay:.20s}
 .skills-page .skills-metric:nth-child(3) .skills-progress i{animation-delay:.28s}
@@ -18,12 +19,14 @@
 .skills-page .skills-metric:nth-child(6) .skills-progress i{animation-delay:.52s}
 .skills-page .skills-metric:nth-child(7) .skills-progress i{animation-delay:.60s}
 
+/* Main Skills score: animate the circular progress from 0 to 86 on page entry. */
 .skills-page .skills-ring{
   --skills-score:0%;
   background:conic-gradient(from -90deg,#0c111a 0 var(--skills-score),rgba(255,255,255,.92) var(--skills-score) 100%)!important;
   animation:skillsRingLoad 2.7s cubic-bezier(.22,.72,.18,1) .16s forwards;
   will-change:background;
 }
+
 .skills-page .skills-ring:before{
   content:"";
   position:absolute;
@@ -33,57 +36,23 @@
   box-shadow:0 0 18px 5px rgba(255,255,255,.62),inset 0 0 18px rgba(255,255,255,.2);
 }
 
-/* Próximas ações — três linhas idênticas no mesmo padrão visual */
-.skills-page .skills-bottom-grid .skills-detail-card:last-child{
-  position:relative;
-  grid-template-rows:58px repeat(3,minmax(0,1fr));
+@keyframes skillsProgressLoad{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
 }
-.skills-page .skills-bottom-grid .skills-detail-card:last-child:before{
-  content:'Enviar proposta';
-  grid-row:2;
-  display:flex;
-  align-items:center;
-  min-height:0;
-  padding:0 17px 0 65px;
-  border-bottom:1px solid rgba(255,255,255,.29);
-  color:#172235;
-  font-size:13.6px;
-  font-weight:340;
-  letter-spacing:-.01em;
-  background:transparent;
-}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child:after{
-  content:'';
-  position:absolute;
-  left:17px;
-  top:calc(58px + (100% - 58px)/6 - 18px);
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  border:1.6px solid rgba(73,96,115,.5);
-  background:rgba(255,255,255,.11);
-  box-sizing:border-box;
-  pointer-events:none;
-}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1){grid-row:3}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2){grid-row:4}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) strong{font-size:0}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) strong:after{content:'Revisar contrato';font-size:13.6px;font-weight:340;letter-spacing:-.01em}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) p{font-size:0}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(1) p:after{content:'Antes de enviar';font-size:11.8px;line-height:1.2;font-weight:280}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) strong{font-size:0}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) strong:after{content:'Agendar nova reunião';font-size:13.6px;font-weight:340;letter-spacing:-.01em}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) p{font-size:0}
-.skills-page .skills-bottom-grid .skills-detail-card:last-child .skills-action:nth-of-type(2) p:after{content:'Próximo passo';font-size:11.8px;line-height:1.2;font-weight:280}
 
-@keyframes skillsProgressLoad{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes skillsRingLoad{from{--skills-score:0%}to{--skills-score:86%}}
-
-@media(max-width:1450px){
-  .skills-page .skills-bottom-grid .skills-detail-card:last-child{grid-template-rows:50px repeat(3,minmax(0,1fr))}
-  .skills-page .skills-bottom-grid .skills-detail-card:last-child:after{top:calc(50px + (100% - 50px)/6 - 18px)}
+@keyframes skillsRingLoad{
+  from{--skills-score:0%}
+  to{--skills-score:86%}
 }
+
 @media(prefers-reduced-motion:reduce){
-  .skills-page .skills-progress i{animation:none;transform:scaleX(1)}
-  .skills-page .skills-ring{animation:none;--skills-score:86%}
+  .skills-page .skills-progress i{
+    animation:none;
+    transform:scaleX(1);
+  }
+  .skills-page .skills-ring{
+    animation:none;
+    --skills-score:86%;
+  }
 }
