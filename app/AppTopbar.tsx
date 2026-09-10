@@ -1,22 +1,58 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Search } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import {Bell,Search} from 'lucide-react';
+import {usePathname,useRouter} from 'next/navigation';
+import {useEffect,useRef,useState} from 'react';
 import './app-topbar.css';
 
 const nav=[['Início','/'],['Skills','/skills'],['Agenda','/agenda'],['Planos e Preços','/planos']] as const;
 
-export default function AppTopbar(){
+type AppTopbarProps={
+  floating?:boolean;
+  searchPlaceholder?:string;
+  nextLabel?:string;
+  nextDateTime?:string;
+  performancePercent?:number;
+};
+
+export default function AppTopbar({
+  floating=true,
+  searchPlaceholder='Buscar reunião, pessoa ou gravação...',
+  nextLabel='Sua próxima Reunião',
+  nextDateTime='14:00 — 30 Set 2026',
+  performancePercent=69
+}:AppTopbarProps){
   const pathname=usePathname();
   const router=useRouter();
+  const [notificationsOpen,setNotificationsOpen]=useState(false);
+  const notificationRef=useRef<HTMLDivElement>(null);
+  const notificationButtonRef=useRef<HTMLButtonElement>(null);
+
   useEffect(()=>{if(pathname!=='/')router.prefetch('/')},[pathname,router]);
-  return <header className="shared-topbar">
-    <Link className="shared-brand" href="/" prefetch={true} aria-label="ZYVO"><img src="/zyvo-logo.svg" alt="ZYVO" /></Link>
-    <div className="shared-search"><Search/><span>Buscar reunião, pessoa ou gravação...</span><kbd>⌘ K</kbd></div>
-    <nav>{nav.map(([label,href])=><Link key={href} href={href} prefetch={true} className={pathname===href?'active':''}>{label}</Link>)}</nav>
-    <div className="shared-next"><span>Sua próxima Reunião</span><strong>14:00 — 30 Set 2026</strong></div>
-    <button className="shared-bell" aria-label="Notificações"><Bell/></button>
+  useEffect(()=>{
+    if(!notificationsOpen)return;
+    const onOutside=(e:globalThis.MouseEvent)=>{
+      const target=e.target as Node;
+      if(notificationRef.current?.contains(target)||notificationButtonRef.current?.contains(target))return;
+      setNotificationsOpen(false);
+    };
+    document.addEventListener('mousedown',onOutside);
+    return()=>document.removeEventListener('mousedown',onOutside);
+  },[notificationsOpen]);
+
+  return <header className={`topbar app-topbar ${floating?'app-topbar-floating':''}`}>
+    <Link href="/" prefetch className="zyvo-brand" aria-label="ZYVO"><span className="zyvo-mark">Z</span><span className="zyvo-word">ZYVO</span></Link>
+    <div className="search-box"><Search size={27}/><span>{searchPlaceholder}</span><kbd>⌘ K</kbd></div>
+    <nav className="topnav">{nav.map(([label,href])=><Link href={href} prefetch className={pathname===href?'current':''} key={href}>{label}</Link>)}</nav>
+    <div className="next-meeting"><span>{nextLabel}</span><strong>{nextDateTime}</strong></div>
+    <div className="notification-wrap">
+      <button ref={notificationButtonRef} className={`notification-button ${notificationsOpen?'active':''}`} aria-label="Notificações" aria-expanded={notificationsOpen} onClick={()=>setNotificationsOpen(v=>!v)}><Bell/></button>
+      {notificationsOpen&&<div ref={notificationRef} className="notification-panel">
+        <div className="notification-head"><strong>Notificações</strong><span>Hoje</span></div>
+        <div className="notification-item"><span className="notification-mark"/><div><strong>Próxima reunião</strong><p>{nextDateTime}</p></div></div>
+        <div className="notification-item"><span className="notification-mark muted"/><div><strong>Performance atualizada</strong><p>{performancePercent}% de performance nas reuniões.</p></div></div>
+      </div>}
+    </div>
   </header>;
 }
