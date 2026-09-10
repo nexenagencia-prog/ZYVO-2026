@@ -5,7 +5,7 @@ type ChatMessage = {
   content: string;
 };
 
-const SYSTEM_PROMPT = `Você é a ZYVO, a inteligência da plataforma ZYVO. Responda em português do Brasil por padrão, a menos que o usuário use outro idioma. Você pode responder perguntas gerais e também é especialmente forte em negócios, vendas, persuasão ética, negociação, marketing, posicionamento, gestão, estratégia, produtividade, comunicação, reuniões, criatividade, tecnologia e tomada de decisão. Seja pragmática, inteligente, direta e útil. Evite clichês e respostas genéricas. Quando fizer sentido, ofereça estruturas, argumentos, scripts, planos, comparações e próximos passos concretos. Não diga que é ChatGPT e não use branding de terceiros na resposta. Não invente fatos, números ou fontes. Se algo exigir informação atual que você não possa verificar, seja transparente.`;
+const SYSTEM_PROMPT = `Você é a ZYVO, a inteligência da plataforma ZYVO. Responda em português do Brasil por padrão, a menos que o usuário use outro idioma. Você pode responder perguntas gerais e também é especialmente forte em negócios, vendas, persuasão ética, negociação, marketing, posicionamento, gestão, estratégia, produtividade, comunicação, reuniões, criatividade, tecnologia e tomada de decisão. Seja pragmática, inteligente, direta e útil. Evite clichês e respostas genéricas. Quando fizer sentido, organize a resposta em parágrafos curtos e legíveis. Não use Markdown. Não use asteriscos, hashtags, setas, marcadores com hífen, bullets, listas em Markdown, blocos de código ou símbolos de formatação. Não escreva sintaxe como **texto**, *texto*, # título, - item, > texto ou [texto](link). Entregue sempre texto limpo, natural e pronto para ser exibido diretamente no chat. Se precisar enumerar itens, use frases curtas separadas por quebras de linha, sem símbolos no início. Não diga que é ChatGPT e não use branding de terceiros na resposta. Não invente fatos, números ou fontes. Se algo exigir informação atual que você não possa verificar, seja transparente.`;
 
 function extractText(payload: any){
   if(typeof payload?.output_text==='string'&&payload.output_text.trim())return payload.output_text.trim();
@@ -16,6 +16,26 @@ function extractText(payload: any){
     }
   }
   return chunks.join('\n').trim();
+}
+
+function cleanChatText(value:string){
+  return value
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g,'$1')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'$1')
+    .replace(/\*\*([^*]+)\*\*/g,'$1')
+    .replace(/__([^_]+)__/g,'$1')
+    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g,'$1')
+    .replace(/(?<!_)_([^_\n]+)_(?!_)/g,'$1')
+    .replace(/^\s{0,3}#{1,6}\s+/gm,'')
+    .replace(/^\s*>\s?/gm,'')
+    .replace(/^\s*[-*+•→➜➤►]\s+/gm,'')
+    .replace(/^\s*\d+[.)]\s+/gm,'')
+    .replace(/```[\s\S]*?```/g,match=>match.replace(/```[a-zA-Z0-9_-]*\n?/g,'').replace(/```/g,''))
+    .replace(/`([^`]+)`/g,'$1')
+    .replace(/\\([*_#>\-])/g,'$1')
+    .replace(/[ \t]+\n/g,'\n')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
 }
 
 export async function POST(request: Request){
@@ -68,7 +88,7 @@ export async function POST(request: Request){
       return NextResponse.json({error:providerMessage?'A ZYVO encontrou uma falha na conexão com a IA.':'A ZYVO não conseguiu responder agora.'},{status:502});
     }
 
-    const answer=extractText(data);
+    const answer=cleanChatText(extractText(data));
     if(!answer){
       return NextResponse.json({error:'A ZYVO não recebeu uma resposta válida da inteligência.'},{status:502});
     }
