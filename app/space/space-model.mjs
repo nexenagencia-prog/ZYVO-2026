@@ -43,3 +43,18 @@ export function mergeSlides(current,incoming){
 export function selectParticipant(participants,id){
   return participants.find(person=>person.id===id)??null;
 }
+
+export function getSlideOverlay(slide){
+  if(slide?.kind!=='insight')return null;
+  return {title:slide.title,copy:slide.copy,sourceLabel:'Insight da reunião'};
+}
+
+export function previousSlideIndex(index,length){
+  if(length<=0)return 0;
+  return (index-1+length)%length;
+}
+
+export function getParticipantPanelView(participants,id){
+  const participant=selectParticipant(participants,id);
+  return participant?{mode:'focus',participant}:{mode:'mosaic',participant:null};
+}

@@ -87,3 +87,28 @@ test('participant selection returns a valid camera or no selection',async()=>{
   assert.deepEqual(model.selectParticipant(people,'p2'),people[1]);
   assert.equal(model.selectParticipant(people,'missing'),null);
 });
+
+test('file slides hide filename metadata while insight slides keep their copy',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.getSlideOverlay,'function','Space slide overlay policy is missing');
+  assert.equal(model.getSlideOverlay({title:'Apresentacao final',source:'computer',kind:'pdf',url:'blob:deck'}),null);
+  assert.deepEqual(model.getSlideOverlay({title:'Proximo foco',copy:'Defina os responsáveis.',source:'space',kind:'insight',url:'space://focus'}),{
+    title:'Proximo foco',copy:'Defina os responsáveis.',sourceLabel:'Insight da reunião',
+  });
+});
+
+test('previous slide navigation wraps from the first slide to the last',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.previousSlideIndex,'function','Previous slide navigation is missing');
+  assert.equal(model.previousSlideIndex(2,4),1);
+  assert.equal(model.previousSlideIndex(0,4),3);
+  assert.equal(model.previousSlideIndex(0,0),0);
+});
+
+test('selected participant uses the in-panel focus view',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.getParticipantPanelView,'function','Participant panel focus state is missing');
+  const people=[{id:'p1',name:'Amanda'},{id:'p2',name:'Marcus'}];
+  assert.deepEqual(model.getParticipantPanelView(people,'p2'),{mode:'focus',participant:people[1]});
+  assert.deepEqual(model.getParticipantPanelView(people,null),{mode:'mosaic',participant:null});
+});
