@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import FloatingAIChat from './FloatingAIChat';
 import GlobalFloatingTools from './GlobalFloatingTools';
 import HeroSlidePhotoEnhancer from './HeroSlidePhotoEnhancer';
+import AnalysisVideoControls from './AnalysisVideoControls';
 
 export const metadata: Metadata = {
   title: 'ZYVO — Videoconferência de alta performance',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <HeroSlidePhotoEnhancer />
+        <AnalysisVideoControls />
         <GlobalFloatingTools />
         <FloatingAIChat />
       </body>
