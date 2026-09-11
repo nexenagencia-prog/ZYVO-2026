@@ -50,3 +50,11 @@ test('analysis route is a dedicated page instead of a simulated Skills click',()
   assert.doesNotMatch(route,/OpenAnalysisOnMount/);
   assert.doesNotMatch(route,/SkillsPage/);
 });
+
+test('saved recordings replace illustrative fallbacks during hydration',async()=>{
+  const {resolveStoredRecordings}=await import('../app/gravacoes/recordings-storage.mjs');
+  const saved=[{id:'custom-1',title:'Minha gravação',thumbnail:'data:image/png;base64,user'}];
+  const fallback=[{id:'r1',title:'Ilustração',thumbnail:'https://images.unsplash.com/example'}];
+
+  assert.deepEqual(resolveStoredRecordings(JSON.stringify(saved),fallback),saved);
+});

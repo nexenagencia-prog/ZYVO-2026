@@ -5,6 +5,7 @@ import {useRouter} from 'next/navigation';
 import {BarChart3,ChevronLeft,ChevronRight,ImagePlus,Pencil,Play,Star,Trash2,X} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
 import AppTopbar from '../AppTopbar';
+import {resolveStoredRecordings} from './recordings-storage.mjs';
 import './gravacoes.css';
 
 type Recording={
@@ -54,8 +55,8 @@ function Rail({children,className='',focusId}:{children:React.ReactNode;classNam
 }
 
 export default function RecordingsPage(){
- const router=useRouter();const[recordings,setRecordings]=useState<Recording[]>(defaults.map((r,i)=>normalizeRecording(r,i)));const[active,setActive]=useState(1);const[editing,setEditing]=useState<Recording|null>(null);const[hydrated,setHydrated]=useState(false);const fileRef=useRef<HTMLInputElement>(null);const pendingThumbnailId=useRef<string|null>(null);
- useEffect(()=>{(async()=>{try{const raw=localStorage.getItem(STORAGE_KEY);const prefs=readPrefs();let base=defaults.map((r,i)=>normalizeRecording(r,i));if(raw){const parsed=JSON.parse(raw);const list=Array.isArray(parsed)?parsed:Array.isArray(parsed?.recordings)?parsed.recordings:[];if(list.length){const saved=list.map((r:Partial<Recording>,i:number)=>normalizeRecording(r,i));const ids=new Set(saved.map(r=>r.id));base=[...saved,...defaults.filter(d=>!ids.has(d.id)).map((r,i)=>normalizeRecording(r,saved.length+i))]}}base=base.map((item,i)=>normalizeRecording({...item,...prefs[item.id],id:item.id},i));const covers=await loadCovers(base.map(r=>r.id));base=base.map(item=>covers[item.id]?{...item,thumbnail:covers[item.id]}:item);setRecordings(base)}catch{}finally{setHydrated(true)}})()},[]);
+ const router=useRouter();const[recordings,setRecordings]=useState<Recording[]>([]);const[active,setActive]=useState(1);const[editing,setEditing]=useState<Recording|null>(null);const[hydrated,setHydrated]=useState(false);const fileRef=useRef<HTMLInputElement>(null);const pendingThumbnailId=useRef<string|null>(null);
+ useEffect(()=>{(async()=>{try{const raw=localStorage.getItem(STORAGE_KEY);const prefs=readPrefs();const stored=resolveStoredRecordings(raw,defaults);let base=stored.map((r:Partial<Recording>,i:number)=>normalizeRecording(r,i));base=base.map((item,i)=>normalizeRecording({...item,...prefs[item.id],id:item.id},i));const covers=await loadCovers(base.map(r=>r.id));base=base.map(item=>covers[item.id]?{...item,thumbnail:covers[item.id]}:item);setRecordings(base);setActive(index=>Math.min(index,Math.max(0,base.length-1)))}catch{}finally{setHydrated(true)}})()},[]);
  useEffect(()=>{if(!hydrated)return;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(recordings.map(r=>({...r,thumbnail:r.thumbnail.startsWith('data:')?'':r.thumbnail}))));window.dispatchEvent(new Event('zyvo:recordings-updated'))}catch{}},[recordings,hydrated]);
  const update=(next:Recording)=>{const normalized=normalizeRecording(next,recordings.findIndex(r=>r.id===next.id));writePref(normalized);if(normalized.thumbnail.startsWith('data:'))saveCover(normalized.id,normalized.thumbnail);setRecordings(list=>list.map(item=>item.id===normalized.id?normalized:item));setEditing(null)};
  const remove=(id:string)=>{setRecordings(list=>list.filter(item=>item.id!==id));setActive(i=>Math.max(0,Math.min(i,recordings.length-2)))};
