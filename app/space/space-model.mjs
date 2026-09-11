@@ -17,3 +17,29 @@ export function filterParticipants(participants,filter){
   if(filter==='muted')return participants.filter(item=>item.muted);
   return participants;
 }
+
+export function createLocalSlide(file,url,stamp=Date.now()){
+  const isPdf=file?.type==='application/pdf';
+  const isImage=String(file?.type||'').startsWith('image/');
+  if((!isPdf&&!isImage)||!url)return null;
+  return {
+    id:`computer-${stamp}`,
+    title:String(file.name||'Slide').replace(/\.[^.]+$/,''),
+    source:'computer',
+    kind:isPdf?'pdf':'image',
+    url,
+  };
+}
+
+export function mergeSlides(current,incoming){
+  const ids=new Set();
+  return [...current,...incoming].filter(item=>{
+    if(!item?.id||!item?.url||ids.has(item.id))return false;
+    ids.add(item.id);
+    return true;
+  });
+}
+
+export function selectParticipant(participants,id){
+  return participants.find(person=>person.id===id)??null;
+}

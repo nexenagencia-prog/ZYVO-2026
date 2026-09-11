@@ -55,3 +55,35 @@ test('participant filters return all, active, or muted people',async()=>{
   assert.deepEqual(model.filterParticipants(participants,'active'),[participants[0],participants[2]]);
   assert.deepEqual(model.filterParticipants(participants,'muted'),[participants[1],participants[2]]);
 });
+
+test('local slide accepts images and PDFs and rejects unsupported files',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.createLocalSlide,'function','Space slide importer is missing');
+  assert.deepEqual(model.createLocalSlide({name:'proposta.pdf',type:'application/pdf',size:2048},'data:application/pdf;base64,AA==',1700000000000),{
+    id:'computer-1700000000000',title:'proposta',source:'computer',kind:'pdf',url:'data:application/pdf;base64,AA==',
+  });
+  assert.equal(model.createLocalSlide({name:'roteiro.txt',type:'text/plain',size:20},'data:text/plain;base64,AA==',1700000000001),null);
+});
+
+test('creator slides merge with local slides without duplicate ids',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.mergeSlides,'function','Space slide integration is missing');
+  const local=[{id:'local-1',title:'Local',source:'computer',kind:'image',url:'data:image/png;base64,AA=='}];
+  const creator=[
+    {id:'creator-1',title:'Pitch ZYVO',source:'creator',kind:'image',url:'/pitch.png'},
+    {id:'local-1',title:'Duplicado',source:'creator',kind:'image',url:'/duplicate.png'},
+    {id:'invalid',title:'Sem arquivo',source:'creator',kind:'image',url:''},
+  ];
+  assert.deepEqual(model.mergeSlides(local,creator),[
+    local[0],
+    {id:'creator-1',title:'Pitch ZYVO',source:'creator',kind:'image',url:'/pitch.png'},
+  ]);
+});
+
+test('participant selection returns a valid camera or no selection',async()=>{
+  const model=await loadModel();
+  assert.equal(typeof model.selectParticipant,'function','Space participant selection is missing');
+  const people=[{id:'p1',name:'Amanda'},{id:'p2',name:'Marcus'}];
+  assert.deepEqual(model.selectParticipant(people,'p2'),people[1]);
+  assert.equal(model.selectParticipant(people,'missing'),null);
+});

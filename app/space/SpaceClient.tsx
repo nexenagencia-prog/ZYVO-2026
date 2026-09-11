@@ -1,11 +1,11 @@
 'use client';
 
-import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
+import {ChangeEvent,FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {Bell,CalendarDays,Camera,CameraOff,Check,ChevronLeft,ChevronRight,Copy,Ellipsis,Filter,Grid2X2,Heart,LayoutList,MessageCircle,Mic,MicOff,MonitorUp,NotebookPen,PanelBottomClose,Plus,Save,Send,Share2,SlidersHorizontal,Smile,StickyNote,Users,X} from 'lucide-react';
+import {Bell,CalendarDays,Camera,CameraOff,Check,ChevronRight,Copy,Download,Ellipsis,FileUp,Filter,Grid2X2,Heart,LayoutList,Maximize2,MessageCircle,Mic,MicOff,MonitorUp,NotebookPen,PanelBottomClose,Plus,Save,Send,Share2,SlidersHorizontal,Smile,StickyNote,Users,X} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
 import AppTopbar from '../AppTopbar';
-import {appendMessage,filterParticipants,toggleAgendaItem,upsertNote} from './space-model.mjs';
+import {appendMessage,createLocalSlide,filterParticipants,mergeSlides,selectParticipant,toggleAgendaItem,upsertNote} from './space-model.mjs';
 import './space.css';
 
 type Message={id:string;author:string;body:string;time:string;mine:boolean};
@@ -13,10 +13,12 @@ type AgendaItem={id:string;time:string;title:string;done:boolean};
 type Note={id:string;subject:string;body:string;created_at:string;updated_at:string};
 type Participant={id:string;name:string;activity:string;image:string;active:boolean;muted:boolean};
 type ParticipantFilter='all'|'active'|'muted';
+type Slide={id:string;title:string;copy?:string;source:'space'|'computer'|'creator';kind:'insight'|'image'|'pdf';url:string;tone?:string};
 
 const MESSAGES_KEY='zyvo-space-messages';
 const AGENDA_KEY='zyvo-space-agenda';
 const NOTES_KEY='zyvo:guest-notes';
+const CREATOR_SLIDES_KEY='zyvo-created-slides';
 
 const initialMessages:Message[]=[
   {id:'message-1',author:'Amanda',body:'Ótima apresentação!',time:'14:21',mine:false},
@@ -42,10 +44,10 @@ const participants:Participant[]=[
   {id:'p7',name:'Albert Flores',activity:'Ouvindo',image:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=520&q=82',active:false,muted:true},
   {id:'p8',name:'Devon Lane',activity:'Ouvindo',image:'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=520&q=82',active:true,muted:false},
 ];
-const evolution=[
-  {title:'Ótima evolução!',copy:'Você foi mais objetivo e fez perguntas mais estratégicas nesta reunião.',tone:'coral'},
-  {title:'Escuta em alta',copy:'O tempo dedicado às respostas do time cresceu 18% desde a última reunião.',tone:'blue'},
-  {title:'Próximo foco',copy:'Transforme os combinados finais em responsáveis e prazos ainda durante a conversa.',tone:'green'},
+const initialSlides:Slide[]=[
+  {id:'space-slide-1',title:'Ótima evolução!',copy:'Você foi mais objetivo e fez perguntas mais estratégicas nesta reunião.',source:'space',kind:'insight',url:'space://evolution',tone:'coral'},
+  {id:'space-slide-2',title:'Escuta em alta',copy:'O tempo dedicado às respostas do time cresceu 18% desde a última reunião.',source:'space',kind:'insight',url:'space://listening',tone:'blue'},
+  {id:'space-slide-3',title:'Próximo foco',copy:'Transforme os combinados finais em responsáveis e prazos ainda durante a conversa.',source:'space',kind:'insight',url:'space://focus',tone:'green'},
 ];
 
 function readStored<T>(key:string,fallback:T):T{try{const value=localStorage.getItem(key);return value?JSON.parse(value) as T:fallback}catch{return fallback}}
@@ -56,6 +58,8 @@ export default function SpaceClient(){
   const videoRef=useRef<HTMLVideoElement>(null);
   const streamRef=useRef<MediaStream|null>(null);
   const noteTitleRef=useRef<HTMLInputElement>(null);
+  const slideFileRef=useRef<HTMLInputElement>(null);
+  const slideUrlsRef=useRef<string[]>([]);
   const [hydrated,setHydrated]=useState(false);
   const [messages,setMessages]=useState<Message[]>(initialMessages);
   const [message,setMessage]=useState('');
@@ -78,19 +82,30 @@ export default function SpaceClient(){
   const [mediaError,setMediaError]=useState('');
   const [shared,setShared]=useState(false);
   const [slide,setSlide]=useState(0);
+  const [slides,setSlides]=useState<Slide[]>(initialSlides);
+  const [selectedParticipantId,setSelectedParticipantId]=useState<string|null>(null);
+  const [meetingMenuOpen,setMeetingMenuOpen]=useState(false);
+  const [reactionCounts,setReactionCounts]=useState({likes:12,messages:8,shares:3});
 
   useEffect(()=>{
     setMessages(readStored(MESSAGES_KEY,initialMessages));
     setAgenda(readStored(AGENDA_KEY,initialAgenda));
     setNotes(readStored(NOTES_KEY,initialNotes));
+    const creator=readStored<Slide[]>(CREATOR_SLIDES_KEY,[]);
+    setSlides(mergeSlides(initialSlides,creator) as Slide[]);
+    const syncCreatorSlides=()=>setSlides(current=>mergeSlides(current,readStored<Slide[]>(CREATOR_SLIDES_KEY,[])) as Slide[]);
+    window.addEventListener('storage',syncCreatorSlides);
+    window.addEventListener('zyvo:slides-updated',syncCreatorSlides);
     setHydrated(true);
-    return()=>{streamRef.current?.getTracks().forEach(track=>track.stop())};
+    return()=>{streamRef.current?.getTracks().forEach(track=>track.stop());slideUrlsRef.current.forEach(url=>URL.revokeObjectURL(url));window.removeEventListener('storage',syncCreatorSlides);window.removeEventListener('zyvo:slides-updated',syncCreatorSlides)};
   },[]);
   useEffect(()=>{if(hydrated)try{localStorage.setItem(MESSAGES_KEY,JSON.stringify(messages))}catch{}},[messages,hydrated]);
   useEffect(()=>{if(hydrated)try{localStorage.setItem(AGENDA_KEY,JSON.stringify(agenda))}catch{}},[agenda,hydrated]);
   useEffect(()=>{if(hydrated)try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes))}catch{}},[notes,hydrated]);
 
   const visibleParticipants=useMemo(()=>filterParticipants(participants,filter) as Participant[],[filter]);
+  const selectedParticipant=useMemo(()=>selectParticipant(participants,selectedParticipantId) as Participant|null,[selectedParticipantId]);
+  const currentSlide=slides[slide]||initialSlides[0];
   const submitMessage=(event:FormEvent)=>{event.preventDefault();setMessages(items=>appendMessage(items,message,currentTime()));setMessage('')};
   const submitAgenda=(event:FormEvent)=>{event.preventDefault();const title=agendaTitle.trim();if(!title)return;setAgenda(items=>[...items,{id:`agenda-${Date.now()}`,time:agendaTime,title,done:false}]);setAgendaTitle('');setAgendaForm(false)};
   const editNote=(note:Note)=>{setNoteId(note.id);setNoteTitle(note.subject);setNoteBody(note.body);noteTitleRef.current?.focus()};
@@ -105,6 +120,9 @@ export default function SpaceClient(){
     try{const fresh=await navigator.mediaDevices.getUserMedia(isCamera?{video:true,audio:false}:{video:false,audio:true});const combined=new MediaStream([...(streamRef.current?.getTracks().filter(track=>track.readyState==='live')||[]),...fresh.getTracks()]);attachStream(combined);isCamera?setCameraOn(true):setMicOn(true)}catch{setMediaError(`Permissão de ${isCamera?'câmera':'microfone'} não concedida.`)}
   };
   const shareSpace=async()=>{setShared(false);try{if(navigator.share)await navigator.share({title:'ZYVO Space',text:'Entre no meu Space da ZYVO',url:location.href});else await navigator.clipboard.writeText(location.href);setShared(true);setTimeout(()=>setShared(false),2200)}catch{setMediaError('Não foi possível compartilhar o link agora.')}};
+  const importSlides=(event:ChangeEvent<HTMLInputElement>)=>{const files=[...(event.target.files||[])];const imported=files.map((file,index)=>{const url=URL.createObjectURL(file);slideUrlsRef.current.push(url);return createLocalSlide(file,url,Date.now()+index) as Slide|null}).filter(Boolean) as Slide[];if(imported.length){setSlides(items=>{const next=mergeSlides(items,imported) as Slide[];setSlide(Math.max(0,next.length-imported.length));return next});setMediaError(`${imported.length} ${imported.length===1?'slide aberto':'slides abertos'} no Space.`)}else if(files.length)setMediaError('Use arquivos de imagem ou PDF.');event.target.value=''};
+  const copyCurrentSlide=async()=>{try{await navigator.clipboard.writeText([currentSlide.title,currentSlide.copy].filter(Boolean).join('\n'));setMediaError('Conteúdo do slide copiado.')}catch{setMediaError('Não foi possível copiar este slide.')}};
+  const saveCurrentSlide=()=>{let url=currentSlide.url;let revoke=false;if(currentSlide.kind==='insight'){url=URL.createObjectURL(new Blob([[currentSlide.title,currentSlide.copy].filter(Boolean).join('\n\n')],{type:'text/plain'}));revoke=true}const anchor=document.createElement('a');anchor.href=url;anchor.download=`${currentSlide.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.${currentSlide.kind==='pdf'?'pdf':currentSlide.kind==='image'?'png':'txt'}`;anchor.click();if(revoke)setTimeout(()=>URL.revokeObjectURL(url),0);setMediaError('Slide salvo no computador.')};
 
   return <main className="app-shell space-page">
     <AppSidebar/>
@@ -112,17 +130,17 @@ export default function SpaceClient(){
       <AppTopbar/>
       <div className="space-workspace">
         <section className="space-live-card" aria-label="Reunião ao vivo">
-          <div className="space-host"><span className="space-live-dot"/><strong>Sandro</strong><time>00:24</time><button aria-label="Mais opções da reunião"><Ellipsis/></button></div>
-          <div className="space-host-media"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1100&q=88" alt="Sandro na reunião"/><video ref={videoRef} autoPlay muted playsInline className={cameraOn?'is-visible':''}/><div className="space-reactions"><span><Heart fill="currentColor"/>12</span><span><MessageCircle/>8</span><span><Send/>3</span></div></div>
+          <div className="space-host"><span className="space-live-dot"/><strong>Sandro</strong><time>00:24</time><button aria-label="Mais opções da reunião" aria-expanded={meetingMenuOpen} onClick={()=>setMeetingMenuOpen(value=>!value)}><Ellipsis/></button>{meetingMenuOpen&&<div className="space-host-menu"><button onClick={()=>setChatOpen(value=>!value)}>{chatOpen?'Ocultar':'Mostrar'} chat</button><button onClick={()=>setMediaError('Qualidade automática ativada.')}>Qualidade automática</button></div>}</div>
+          <div className="space-host-media"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1100&q=88" alt="Sandro na reunião"/><video ref={videoRef} autoPlay muted playsInline className={cameraOn?'is-visible':''}/><div className="space-reactions"><button onClick={()=>setReactionCounts(value=>({...value,likes:value.likes+1}))} aria-label="Curtir reunião"><Heart fill="currentColor"/>{reactionCounts.likes}</button><button onClick={()=>setChatOpen(true)} aria-label="Abrir chat"><MessageCircle/>{reactionCounts.messages}</button><button onClick={()=>{setReactionCounts(value=>({...value,shares:value.shares+1}));shareSpace()}} aria-label="Compartilhar reunião"><Send/>{reactionCounts.shares}</button></div></div>
           {chatOpen&&<div className="space-chat-panel"><div className="space-chat-list">{messages.slice(-4).map(item=><div className={item.mine?'mine':''} key={item.id}><b>{item.author}</b><time>{item.time}</time><p>{item.body}</p></div>)}</div><form onSubmit={submitMessage}><input value={message} onChange={e=>setMessage(e.target.value)} aria-label="Mensagem" placeholder="Enviar uma mensagem..."/><Smile/><button aria-label="Enviar mensagem"><Send/></button></form></div>}
         </section>
 
         <section className="space-participants-panel space-glass" aria-label="Participantes">
           <header><div><strong>Participantes</strong><span>{visibleParticipants.length}</span></div><div className="space-view-switch"><button className={layout==='mosaic'?'active':''} onClick={()=>setLayout('mosaic')} aria-label="Visualização em mosaico" aria-pressed={layout==='mosaic'}><Grid2X2/>Mosaico</button><button className={layout==='list'?'active':''} onClick={()=>setLayout('list')} aria-label="Visualização em lista" aria-pressed={layout==='list'}><LayoutList/></button></div></header>
-          <div className={`space-participants ${layout}`}>{visibleParticipants.map(person=><article key={person.id}><img src={person.image} alt={person.name}/><div><small>{person.activity}</small><strong>{person.name}</strong></div><span className={person.muted?'muted':'active'}>{person.muted?<MicOff/>:<Mic/>}</span></article>)}</div>
+          <div className={`space-participants ${layout}`}>{visibleParticipants.map(person=><button className="space-participant-card" key={person.id} onClick={()=>setSelectedParticipantId(person.id)} aria-label={`Expandir câmera de ${person.name}`}><img src={person.image} alt=""/><div><small>{person.activity}</small><strong>{person.name}</strong></div><span className={person.muted?'muted':'active'}>{person.muted?<MicOff/>:<Mic/>}</span><Maximize2 className="space-participant-expand"/></button>)}</div>
         </section>
 
-        <section className={`space-evolution space-glass ${evolution[slide].tone}`} aria-label="Evolução da reunião"><div className="space-evolution-copy"><div><Copy/><Save/></div><h1>{evolution[slide].title}</h1><p>{evolution[slide].copy}</p><div className="space-dots">{evolution.map((_,index)=><button key={index} className={index===slide?'active':''} onClick={()=>setSlide(index)} aria-label={`Evolução ${index+1}`}/>)}</div></div><div className="space-wave"/><button className="space-next-slide" onClick={()=>setSlide(index=>(index+1)%evolution.length)} aria-label="Próxima evolução"><ChevronRight/></button></section>
+        <section className={`space-evolution space-glass ${currentSlide.tone||'file'}`} aria-label="Slides da reunião"><input ref={slideFileRef} className="space-slide-input" type="file" accept="image/*,application/pdf,.pdf" multiple onChange={importSlides}/>{currentSlide.kind==='image'&&<img className="space-slide-media" src={currentSlide.url} alt={currentSlide.title}/>} {currentSlide.kind==='pdf'&&<iframe className="space-slide-media" src={currentSlide.url} title={currentSlide.title}/>}<div className={`space-evolution-copy ${currentSlide.kind!=='insight'?'file-copy':''}`}><div className="space-slide-actions"><button onClick={()=>slideFileRef.current?.click()} aria-label="Abrir slides do computador"><FileUp/></button><button onClick={copyCurrentSlide} aria-label="Copiar conteúdo do slide"><Copy/></button><button onClick={saveCurrentSlide} aria-label="Salvar slide no computador"><Download/></button></div><h1>{currentSlide.title}</h1>{currentSlide.copy&&<p>{currentSlide.copy}</p>}<small>{currentSlide.source==='creator'?'Criado na ZYVO':currentSlide.source==='computer'?'Aberto do computador':'Insight da reunião'}</small><div className="space-dots">{slides.map((item,index)=><button key={item.id} className={index===slide?'active':''} onClick={()=>setSlide(index)} aria-label={`Slide ${index+1}: ${item.title}`}/>)}</div></div>{currentSlide.kind==='insight'&&<div className="space-wave"/>}<button className="space-next-slide" onClick={()=>setSlide(index=>(index+1)%slides.length)} aria-label="Próximo slide"><ChevronRight/></button></section>
 
         <section className="space-agenda space-glass" aria-label="Agenda do Space"><header><div><CalendarDays/><span><strong>Agenda</strong><small>Suas próximas reuniões</small></span></div><button onClick={()=>setAgendaForm(value=>!value)} aria-label="Adicionar à agenda"><Plus/></button></header>{agendaForm&&<form onSubmit={submitAgenda} className="space-agenda-form"><input aria-label="Horário da reunião" type="time" value={agendaTime} onChange={e=>setAgendaTime(e.target.value)}/><input aria-label="Nome da reunião" autoFocus value={agendaTitle} onChange={e=>setAgendaTitle(e.target.value)} placeholder="Nome da reunião"/><button aria-label="Salvar reunião"><Check/></button></form>}<div className="space-agenda-list">{agenda.map(item=><button key={item.id} className={item.done?'done':''} onClick={()=>setAgenda(items=>toggleAgendaItem(items,item.id))}><time>{item.time}</time><span>{item.title}</span>{item.done?<Check/>:<ChevronRight/>}</button>)}</div></section>
 
@@ -141,6 +159,7 @@ export default function SpaceClient(){
         <button className="space-leave" onClick={()=>setExitOpen(true)}><Share2/><span>Sair</span></button>
       </nav>
       {mediaError&&<div className="space-toast" role="status"><Bell/>{mediaError}<button onClick={()=>setMediaError('')} aria-label="Fechar aviso"><X/></button></div>}
+      {selectedParticipant&&<div className="space-participant-focus-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setSelectedParticipantId(null)}}><section className="space-participant-focus" role="dialog" aria-modal="true" aria-label={`Câmera de ${selectedParticipant.name}`}><img src={selectedParticipant.image} alt={selectedParticipant.name}/><div className="space-participant-focus-shade"/><button className="space-participant-focus-close" onClick={()=>setSelectedParticipantId(null)} aria-label="Fechar câmera ampliada"><X/></button><div className="space-participant-focus-copy"><small>{selectedParticipant.activity}</small><h2>{selectedParticipant.name}</h2><span>{selectedParticipant.muted?<><MicOff/>Microfone silenciado</>:<><Mic/>Participando agora</>}</span></div></section></div>}
       {exitOpen&&<div className="space-dialog-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setExitOpen(false)}}><div className="space-dialog" role="dialog" aria-modal="true" aria-labelledby="space-exit-title"><button className="space-dialog-close" onClick={()=>setExitOpen(false)} aria-label="Fechar"><X/></button><h2 id="space-exit-title">Sair do Space?</h2><p>A câmera e o microfone serão desligados. Suas mensagens, agenda e anotações permanecerão salvas.</p><div><button onClick={()=>setExitOpen(false)}>Continuar na reunião</button><button className="danger" onClick={()=>router.push('/')}>Sair agora</button></div></div></div>}
     </section>
   </main>;
