@@ -1,5 +1,6 @@
 import './globals.css';
 import './logo.css';
+import './gravacoes/recordings-spacing.css';
 import type { Metadata } from 'next';
 import FloatingAIChat from './FloatingAIChat';
 import GlobalFloatingTools from './GlobalFloatingTools';
