@@ -2,14 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 
-const page=await readFile(new URL('../app/gravacoes/page.tsx',import.meta.url),'utf8');
 const css=await readFile(new URL('../app/gravacoes/gravacoes.css',import.meta.url),'utf8');
 
 test('recordings lower rails are intentionally staggered',()=>{
-  assert.match(page,/className="recordings-row-one"/);
-  assert.match(page,/className="recordings-row-two"/);
-  assert.match(css,/\.recordings-row-one\{[^}]*padding-left:/);
-  assert.match(css,/\.recordings-row-two\{[^}]*padding-left:/);
+  assert.match(css,/\.recordings-stage > \.recordings-rail:nth-of-type\(1\)\{[^}]*padding-left:/);
+  assert.match(css,/\.recordings-stage > \.recordings-rail:nth-of-type\(2\)\{[^}]*padding-left:/);
 });
 
 test('featured carousel keeps a dominant center card and narrow side cards',()=>{
