@@ -36,7 +36,7 @@ export default function ContatosPage(){
 
  return <main className="contacts-page">
    <AppSidebar/>
-   <AppTopbar floating/>
+   <AppTopbar/>
    <section className="contacts-content">
      <div className="contacts-inner">
        <h1>Conexões<br/>para reuniões de <span>alto nível.</span></h1>

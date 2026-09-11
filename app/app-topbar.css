@@ -1,19 +1,17 @@
-.app-topbar{z-index:80;display:grid;grid-template-columns:minmax(440px,1.25fr) minmax(430px,1fr) 220px;gap:20px;align-items:start;box-sizing:border-box}
-.app-topbar .search-box{height:58px;max-width:500px;border-radius:30px;background:rgba(255,255,255,.48);border:1px solid rgba(255,255,255,.72);display:flex;align-items:center;padding:0 20px;gap:14px;transform:translateY(-7px);box-sizing:border-box}
-.app-topbar .search-box span{flex:1;color:#65717b;font-size:14px;font-weight:350;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.app-topbar .search-box kbd{border:0;background:#cfd7dc66;border-radius:9px;padding:6px 10px;font-weight:350}
-.app-topbar .topnav{display:flex;gap:42px;justify-content:center;padding-top:8px;white-space:nowrap}
-.app-topbar .topnav a{font-size:14px;color:#37434d;font-weight:350;text-decoration:none}
-.app-topbar .topnav .current{font-weight:500;color:#090b0c;position:relative}
-.app-topbar .topnav .current:after{content:"";position:absolute;width:8px;height:8px;background:#050606;border-radius:50%;left:50%;bottom:-20px;transform:translateX(-50%)}
-.app-topbar .next-meeting{border-left:1px solid #56636d55;padding-left:27px;display:flex;flex-direction:column;min-width:0}
-.app-topbar .next-meeting span{font-size:11px;color:#66727b;font-weight:350}
-.app-topbar .next-meeting strong{font-size:14px;margin-top:3px;font-weight:500;white-space:nowrap}
-.app-topbar .notification-wrap{position:relative;grid-column:3;justify-self:end;margin-top:48px}
-.app-topbar .notification-button{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.56);display:grid;place-items:center;color:#26313d;cursor:pointer}
-.app-topbar .notification-button svg{width:17px;height:17px;stroke-width:1.5}
-.app-topbar .notification-panel{position:absolute;right:0;top:46px;width:280px;padding:14px;border-radius:18px;background:rgba(255,255,255,.96);box-shadow:0 18px 50px rgba(32,44,52,.14);border:1px solid rgba(215,222,227,.9);backdrop-filter:blur(20px)}
-.app-topbar-floating{position:fixed!important;top:36px!important;left:258px!important;right:52px!important;width:auto!important}
-@media(max-width:1450px){.app-topbar{grid-template-columns:minmax(360px,1.2fr) minmax(350px,1fr) 200px}.app-topbar .topnav{gap:27px}.app-topbar-floating{top:28px!important;left:250px!important;right:3vw!important}}
-@media(max-width:1180px){.app-topbar{grid-template-columns:minmax(300px,1fr) minmax(310px,1fr) 180px}.app-topbar .topnav{gap:18px}.app-topbar-floating{left:230px!important;right:30px!important}}
-@media(max-width:820px){.app-topbar{grid-template-columns:1fr;gap:10px}.app-topbar .topnav,.app-topbar .next-meeting,.app-topbar .notification-wrap{display:none}.app-topbar-floating{top:20px!important;left:200px!important;right:18px!important}}
+.app-topbar{z-index:80}
+.app-topbar-floating{
+  position:fixed!important;
+  top:36px!important;
+  left:258px!important;
+  right:52px!important;
+  width:auto!important;
+}
+@media(max-width:1450px){
+  .app-topbar-floating{top:28px!important;left:250px!important;right:3vw!important}
+}
+@media(max-width:1180px){
+  .app-topbar-floating{left:230px!important;right:30px!important}
+}
+@media(max-width:820px){
+  .app-topbar-floating{top:20px!important;left:200px!important;right:18px!important}
+}
