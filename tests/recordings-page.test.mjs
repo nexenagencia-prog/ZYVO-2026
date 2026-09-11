@@ -4,7 +4,6 @@ import fs from 'node:fs';
 
 const pagePath='app/gravacoes/page.tsx';
 const cssPath='app/gravacoes/gravacoes.css';
-const bridgePath='app/SelectedRecordingAnalysisBridge.tsx';
 const sidebar=fs.readFileSync('app/AppSidebar.tsx','utf8');
 
 test('sidebar opens recordings route',()=>{
@@ -26,7 +25,6 @@ test('recordings page exposes editable gallery controls',()=>{
   assert.match(page,/featured-title-line-one/);
   assert.match(page,/featured-title-line-two/);
   assert.match(page,/featuredItems/);
-  assert.match(page,/recordings-featured-rail" loop/);
 });
 
 test('recordings rails move freely and featured cards all use the highlighted rectangle size',()=>{
@@ -38,20 +36,17 @@ test('recordings rails move freely and featured cards all use the highlighted re
   assert.match(css,/\.recordings-row-two \.recordings-small-card:nth-child\(4n\+2\)/);
 });
 
-test('analyze action carries the selected recording into Skills',()=>{
-  const bridge=fs.readFileSync(bridgePath,'utf8');
-  assert.match(bridge,/zyvo-selected-analysis/);
-  assert.match(bridge,/closest\('\.recordings-featured-card, \.recordings-small-card'\)/);
-  assert.match(bridge,/\/skills\?analysis=/);
+test('analyze action stores selection and navigates directly to meeting analysis',()=>{
+  const page=fs.readFileSync(pagePath,'utf8');
+  assert.match(page,/const SELECTED_KEY='zyvo-selected-analysis'/);
+  assert.match(page,/localStorage\.setItem\(SELECTED_KEY,JSON\.stringify\(item\)\)/);
+  assert.match(page,/router\.push\(`\/analise-reunioes\?analysis=\$\{encodeURIComponent\(item\.id\)\}`\)/);
+  assert.doesNotMatch(page,/SelectedRecordingAnalysisBridge/);
 });
 
-test('Skills auto-opens and personalizes analysis for the selected recording',()=>{
-  const bridge=fs.readFileSync(bridgePath,'utf8');
-  assert.match(bridge,/window\.location\.pathname==='\/skills'/);
-  assert.match(bridge,/skills-analysis-button/);
-  assert.match(bridge,/buildRecordingMetrics/);
-  assert.match(bridge,/analysis-video-image/);
-  assert.match(bridge,/analysis-meeting/);
-  assert.match(bridge,/analysis-score-ring/);
-  assert.match(bridge,/analysis-metric/);
+test('analysis route is a dedicated page instead of a simulated Skills click',()=>{
+  const route=fs.readFileSync('app/analise-reunioes/page.tsx','utf8');
+  assert.match(route,/AnalysisPageClient/);
+  assert.doesNotMatch(route,/OpenAnalysisOnMount/);
+  assert.doesNotMatch(route,/SkillsPage/);
 });
