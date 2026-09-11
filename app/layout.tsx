@@ -1,12 +1,14 @@
 import './globals.css';
 import './logo.css';
 import './gravacoes/recordings-spacing.css';
+import './gravacoes/recordings-editor-preview.css';
 import type { Metadata } from 'next';
 import FloatingAIChat from './FloatingAIChat';
 import GlobalFloatingTools from './GlobalFloatingTools';
 import HeroSlidePhotoEnhancer from './HeroSlidePhotoEnhancer';
 import AnalysisVideoControls from './AnalysisVideoControls';
 import SelectedRecordingAnalysisBridge from './SelectedRecordingAnalysisBridge';
+import RecordingsUXEnhancer from './RecordingsUXEnhancer';
 
 export const metadata: Metadata = {
   title: 'ZYVO — Videoconferência de alta performance',
@@ -19,6 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <HeroSlidePhotoEnhancer />
+        <RecordingsUXEnhancer />
         <SelectedRecordingAnalysisBridge />
         <AnalysisVideoControls />
         <GlobalFloatingTools />
