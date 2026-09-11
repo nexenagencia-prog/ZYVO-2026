@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const pagePath='app/gravacoes/page.tsx';
 const cssPath='app/gravacoes/gravacoes.css';
-const skillsPath='app/skills/page.tsx';
+const bridgePath='app/SelectedRecordingAnalysisBridge.tsx';
 const sidebar=fs.readFileSync('app/AppSidebar.tsx','utf8');
 
 test('sidebar opens recordings route',()=>{
@@ -39,19 +39,19 @@ test('recordings rails move freely and featured cards all use the highlighted re
 });
 
 test('analyze action carries the selected recording into Skills',()=>{
-  const page=fs.readFileSync(pagePath,'utf8');
-  assert.match(page,/zyvo-selected-analysis/);
-  assert.match(page,/openAnalysis\(item\)/);
-  assert.match(page,/router\.push\(`\/skills\?analysis=\$\{encodeURIComponent\(item\.id\)\}`\)/);
+  const bridge=fs.readFileSync(bridgePath,'utf8');
+  assert.match(bridge,/zyvo-selected-analysis/);
+  assert.match(bridge,/closest\('\.recordings-featured-card, \.recordings-small-card'\)/);
+  assert.match(bridge,/\/skills\?analysis=/);
 });
 
-test('Skills auto-opens an individual recording analysis',()=>{
-  const skills=fs.readFileSync(skillsPath,'utf8');
-  assert.match(skills,/zyvo-selected-analysis/);
-  assert.match(skills,/window\.location\.search/);
-  assert.match(skills,/setAnalysisOpen\(true\)/);
-  assert.match(skills,/analysisRecording/);
-  assert.match(skills,/buildRecordingMetrics/);
-  assert.match(skills,/recording\.thumbnail/);
-  assert.match(skills,/recording\.title/);
+test('Skills auto-opens and personalizes analysis for the selected recording',()=>{
+  const bridge=fs.readFileSync(bridgePath,'utf8');
+  assert.match(bridge,/window\.location\.pathname==='\/skills'/);
+  assert.match(bridge,/skills-analysis-button/);
+  assert.match(bridge,/buildRecordingMetrics/);
+  assert.match(bridge,/analysis-video-image/);
+  assert.match(bridge,/analysis-meeting/);
+  assert.match(bridge,/analysis-score-ring/);
+  assert.match(bridge,/analysis-metric/);
 });
