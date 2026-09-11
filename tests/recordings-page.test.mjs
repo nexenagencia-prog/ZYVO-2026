@@ -20,11 +20,15 @@ test('recordings page exposes editable gallery controls',()=>{
   assert.match(page,/Performance/);
   assert.match(page,/onPointerDown/);
   assert.match(page,/scrollLeft/);
+  assert.match(page,/featuredItems/);
+  assert.match(page,/recordings-featured-rail" loop/);
 });
 
-test('recordings gallery styles horizontal rails and featured card',()=>{
+test('recordings rails move freely without snapping into columns',()=>{
   const css=fs.readFileSync(cssPath,'utf8');
-  assert.match(css,/scroll-snap-type:\s*x mandatory/);
+  assert.doesNotMatch(css,/scroll-snap-type:\s*x mandatory/);
   assert.match(css,/\.recordings-featured-card/);
   assert.match(css,/\.recordings-rail/);
+  assert.match(css,/\.recordings-row-one \.recordings-small-card:nth-child\(3n\+1\)/);
+  assert.match(css,/\.recordings-row-two \.recordings-small-card:nth-child\(4n\+2\)/);
 });
