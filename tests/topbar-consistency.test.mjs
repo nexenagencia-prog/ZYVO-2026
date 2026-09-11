@@ -15,11 +15,21 @@ test('Home and Contacts use the same AppTopbar component',async()=>{
   assert.match(contacts,/<AppTopbar\b/);
 });
 
-test('AppTopbar preserves the Hero topbar structure and class names',async()=>{
+test('AppTopbar preserves the Hero topbar structure and defaults to Hero positioning',async()=>{
   const topbar=await read('app/AppTopbar.tsx');
   for(const className of ['topbar','zyvo-brand','search-box','topnav','next-meeting','notification-button']){
     assert.ok(topbar.includes(className),`missing Hero class ${className}`);
   }
+  assert.match(topbar,/floating=false/);
+});
+
+test('Recordings uses the Hero topbar spacing instead of a floating override',async()=>{
+  const [page,css]=await Promise.all([
+    read('app/gravacoes/page.tsx'),
+    read('app/gravacoes/gravacoes.css')
+  ]);
+  assert.match(page,/<AppTopbar\s+floating=\{false\}/);
+  assert.match(css,/\.recordings-content\{[^}]*padding:36px 52px 42px 154px/s);
 });
 
 test('Contacts keeps the shared topbar above page content so links remain clickable',async()=>{
