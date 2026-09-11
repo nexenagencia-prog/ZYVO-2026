@@ -64,8 +64,10 @@ export default function RecordingsPage(){
  const openAnalysis=(item:Recording)=>{try{localStorage.setItem(SELECTED_KEY,JSON.stringify(item))}catch{}router.push(`/analise-reunioes?analysis=${encodeURIComponent(item.id)}`)};
  const featured=recordings[active]??recordings[0];
  const shift=(dir:number)=>{if(!recordings.length)return;setActive(i=>Math.max(0,Math.min(recordings.length-1,i+dir)))};
- const selectFromSmall=(id:string)=>{const index=recordings.findIndex(r=>r.id===id);if(index>=0)setActive(index)};
+ const selectFromSmall=(id:string)=>{const index=recordings.findIndex(r=>r.id===id);if(index>=0){setActive(index);requestAnimationFrame(()=>document.querySelector('.recordings-featured-wrap')?.scrollIntoView({behavior:'smooth',block:'nearest'}))}};
  const reversed=[...recordings].reverse();
+ const repeated=[...recordings,...recordings,...recordings];
+ const repeatedReversed=[...reversed,...reversed,...reversed];
  return <main className="recordings-page"><AppSidebar/><section className="content recordings-content"><AppTopbar floating={false}/><div className="recordings-stage">
   <input ref={fileRef} className="recordings-file-input" type="file" accept="image/*" onChange={changeThumbnail}/>
   {featured&&<section className="recordings-featured-wrap">
@@ -79,8 +81,8 @@ export default function RecordingsPage(){
    </Rail>
    <button className="recordings-arrow right" onClick={()=>shift(1)} disabled={active===recordings.length-1} aria-label="Próxima gravação"><ChevronRight/></button>
   </section>}
-  <Rail className="recordings-row-one">{recordings.map(item=><SmallCard key={`a-${item.id}`} item={item} onOpen={()=>selectFromSmall(item.id)} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>openAnalysis(item)}/>)}</Rail>
-  <Rail className="recordings-row-two">{reversed.map(item=><SmallCard key={`b-${item.id}`} item={item} onOpen={()=>selectFromSmall(item.id)} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>openAnalysis(item)}/>)}</Rail>
+  <Rail className="recordings-row-one">{repeated.map((item,index)=><SmallCard key={`a-${item.id}-${index}`} item={item} onOpen={()=>selectFromSmall(item.id)} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>openAnalysis(item)}/>)}</Rail>
+  <Rail className="recordings-row-two">{repeatedReversed.map((item,index)=><SmallCard key={`b-${item.id}-${index}`} item={item} onOpen={()=>selectFromSmall(item.id)} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>openAnalysis(item)}/>)}</Rail>
  </div></section>
  {editing&&<EditModal value={editing} onClose={()=>setEditing(null)} onSave={update}/>}</main>;
 }
