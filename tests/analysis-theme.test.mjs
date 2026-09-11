@@ -23,3 +23,10 @@ test('meeting analysis uses the same uninterrupted canvas as the approved view',
   assert.match(dedicated,/\.analysis-page \.content\{[^}]*background:#fbfcfd/s);
   assert.doesNotMatch(dedicated,/\.analysis-page \.content\{[^}]*background-image:/s);
 });
+
+test('meeting analysis owns a full-viewport backdrop without global floating controls',()=>{
+  const css=fs.readFileSync('app/analise-reunioes/analysis.css','utf8');
+
+  assert.match(css,/\.analysis-page:before\{[^}]*position:fixed[^}]*inset:0[^}]*zyvo-analysis-background\.jpg/s);
+  assert.match(css,/body:has\(\.analysis-page\) \.zyvo-ai-chat[^}]*display:none!important/s);
+});
