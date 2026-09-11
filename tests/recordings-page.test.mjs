@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const pagePath='app/gravacoes/page.tsx';
 const cssPath='app/gravacoes/gravacoes.css';
+const skillsPath='app/skills/page.tsx';
 const sidebar=fs.readFileSync('app/AppSidebar.tsx','utf8');
 
 test('sidebar opens recordings route',()=>{
@@ -35,4 +36,22 @@ test('recordings rails move freely and featured cards all use the highlighted re
   assert.doesNotMatch(css,/\.recordings-featured-card\.is-active\{[^}]*flex-basis:/s);
   assert.match(css,/\.recordings-row-one \.recordings-small-card:nth-child\(3n\+1\)/);
   assert.match(css,/\.recordings-row-two \.recordings-small-card:nth-child\(4n\+2\)/);
+});
+
+test('analyze action carries the selected recording into Skills',()=>{
+  const page=fs.readFileSync(pagePath,'utf8');
+  assert.match(page,/zyvo-selected-analysis/);
+  assert.match(page,/openAnalysis\(item\)/);
+  assert.match(page,/router\.push\(`\/skills\?analysis=\$\{encodeURIComponent\(item\.id\)\}`\)/);
+});
+
+test('Skills auto-opens an individual recording analysis',()=>{
+  const skills=fs.readFileSync(skillsPath,'utf8');
+  assert.match(skills,/zyvo-selected-analysis/);
+  assert.match(skills,/window\.location\.search/);
+  assert.match(skills,/setAnalysisOpen\(true\)/);
+  assert.match(skills,/analysisRecording/);
+  assert.match(skills,/buildRecordingMetrics/);
+  assert.match(skills,/recording\.thumbnail/);
+  assert.match(skills,/recording\.title/);
 });
