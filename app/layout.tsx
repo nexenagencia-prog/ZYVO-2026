@@ -5,9 +5,6 @@ import './gravacoes/recordings-final-fixes.css';
 import type { Metadata } from 'next';
 import FloatingAIChat from './FloatingAIChat';
 import GlobalFloatingTools from './GlobalFloatingTools';
-import HeroSlidePhotoEnhancer from './HeroSlidePhotoEnhancer';
-import AnalysisVideoControls from './AnalysisVideoControls';
-import SelectedRecordingAnalysisBridge from './SelectedRecordingAnalysisBridge';
 
 export const metadata: Metadata = {
   title: 'ZYVO — Videoconferência de alta performance',
@@ -19,9 +16,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="pt-BR">
       <body>
         {children}
-        <HeroSlidePhotoEnhancer />
-        <SelectedRecordingAnalysisBridge />
-        <AnalysisVideoControls />
         <GlobalFloatingTools />
         <FloatingAIChat />
       </body>
