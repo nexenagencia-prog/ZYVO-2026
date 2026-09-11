@@ -32,7 +32,7 @@ function Rail({children,className=''}:{children:React.ReactNode;className?:strin
 }
 
 export default function RecordingsPage(){
- const router=useRouter();const[recordings,setRecordings]=useState<Recording[]>(defaults);const[active,setActive]=useState(0);const[editing,setEditing]=useState<Recording|null>(null);const fileRef=useRef<HTMLInputElement>(null);const pendingThumbnailId=useRef<string|null>(null);
+ const router=useRouter();const[recordings,setRecordings]=useState<Recording[]>(defaults);const[active,setActive]=useState(1);const[editing,setEditing]=useState<Recording|null>(null);const fileRef=useRef<HTMLInputElement>(null);const pendingThumbnailId=useRef<string|null>(null);
  useEffect(()=>{try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);const list=Array.isArray(parsed)?parsed:Array.isArray(parsed?.recordings)?parsed.recordings:[];if(list.length)setRecordings(list.map((r:Partial<Recording>,i:number)=>({...defaults[i%defaults.length],...r,id:String(r.id??`saved-${i}`)})))}}catch{}},[]);
  useEffect(()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(recordings));window.dispatchEvent(new Event('zyvo:recordings-updated'))}catch{}},[recordings]);
  const update=(next:Recording)=>{setRecordings(list=>list.map(item=>item.id===next.id?next:item));setEditing(null)};
