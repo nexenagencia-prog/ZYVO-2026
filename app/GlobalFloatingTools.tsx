@@ -24,7 +24,7 @@ export default function GlobalFloatingTools(){
   },[]);
 
   return <>
-    <FloatingCalculator open={calculatorOpen} onClose={()=>setCalculatorOpen(false)}/>
-    <FloatingNotes mode={notesMode} onClose={closeNotes}/>
+    {calculatorOpen&&<FloatingCalculator open onClose={()=>setCalculatorOpen(false)}/>}
+    {notesMode&&<FloatingNotes mode={notesMode} onClose={closeNotes}/>}
   </>;
 }
