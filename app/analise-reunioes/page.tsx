@@ -1,5 +1,5 @@
-import SkillsPage from '../skills/page';
+import AnalysisPageClient from './AnalysisPageClient';
 
 export default function MeetingAnalysisPage(){
-  return <SkillsPage/>;
+  return <AnalysisPageClient/>;
 }
