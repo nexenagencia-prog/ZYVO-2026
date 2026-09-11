@@ -8,6 +8,14 @@ const actions=[
   {title:'Agendar nova reunião',meta:'Próximo passo'},
 ];
 
+const DEFAULT_ANALYSIS={
+  id:'skills-latest',
+  title:'Reunião de planejamento',
+  phrase:'Estratégia, proposta e próximos passos.',
+  thumbnail:'/skills-card.png',
+  performance:5,
+};
+
 export default function SkillsActionsEnhancer(){
   useEffect(()=>{
     const apply=()=>{
@@ -32,10 +40,25 @@ export default function SkillsActionsEnhancer(){
       card.dataset.actionsEnhanced='true';
     };
 
+    const openAnalysis=(event:MouseEvent)=>{
+      if(window.location.pathname!=='/skills') return;
+      const target=event.target as HTMLElement|null;
+      const button=target?.closest<HTMLButtonElement>('.skills-analysis-button');
+      if(!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      try{window.localStorage.setItem('zyvo-selected-analysis',JSON.stringify(DEFAULT_ANALYSIS))}catch{}
+      window.location.href='/analise-reunioes?analysis=skills-latest';
+    };
+
     apply();
+    document.addEventListener('click',openAnalysis,true);
     const observer=new MutationObserver(apply);
     observer.observe(document.body,{childList:true,subtree:true});
-    return()=>observer.disconnect();
+    return()=>{
+      observer.disconnect();
+      document.removeEventListener('click',openAnalysis,true);
+    };
   },[]);
 
   return null;
