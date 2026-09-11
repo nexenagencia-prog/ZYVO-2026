@@ -11,6 +11,9 @@ const slidePhotos=[
 
 export default function HeroSlidePhotoEnhancer(){
   useEffect(()=>{
+    if(window.location.pathname!=='/')return;
+
+    let lastIndex=-1;
     const apply=()=>{
       const card=document.querySelector<HTMLElement>('.hero-feature .feature-card');
       if(!card)return;
@@ -19,10 +22,12 @@ export default function HeroSlidePhotoEnhancer(){
       const text=card.querySelector<HTMLElement>('.feature-text');
       const activeDash=Array.from(card.querySelectorAll('.slider-dashes i')).findIndex(item=>item.classList.contains('on'));
       const index=activeDash>=0?activeDash:0;
+      if(index===lastIndex)return;
+      lastIndex=index;
       const url=slidePhotos[index%slidePhotos.length];
 
       if(photo){
-        if(!photo.style.backgroundImage)photo.style.backgroundImage=`url(${url})`;
+        photo.style.backgroundImage=`url(${url})`;
         photo.style.backgroundSize='cover';
         photo.style.backgroundPosition='center';
       }
@@ -39,9 +44,8 @@ export default function HeroSlidePhotoEnhancer(){
     };
 
     apply();
-    const observer=new MutationObserver(apply);
-    observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-    return()=>observer.disconnect();
+    const timer=window.setInterval(apply,700);
+    return()=>window.clearInterval(timer);
   },[]);
 
   return null;
