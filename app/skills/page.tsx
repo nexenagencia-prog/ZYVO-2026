@@ -5,12 +5,14 @@ import type {CSSProperties} from 'react';
 import Link from 'next/link';
 import {Bell,CalendarDays,Check,ChevronLeft,ChevronRight,CircleHelp,FileText,Headphones,Lightbulb,Maximize2,MessageCircle,Mic2,MoreVertical,Play,Search,ShieldCheck,Sparkles,Target,Users,AlertCircle,X} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
+import {analysisThemeClass,analysisThemeVars} from '../analysis-theme.mjs';
 import '../refine.css';
 import '../cms-home.css';
 import '../home-overrides.css';
 import './skills.css';
 import './skills-fix.css';
 import './skills-progress-motion.css';
+import '../analysis-theme.css';
 
 type MetricKey='Comunicação'|'Clareza'|'Escuta'|'Objetividade'|'Perguntas'|'Argumentação'|'Condução';
 type Detail={headline:string;signal:string;evidence:string;quote:string;reading:string;miss:string;better:string;confidence:string};
@@ -48,7 +50,7 @@ function AnalysisView({onBack}:{onBack:()=>void}){
  const selected=selectedMetric?metrics.find(m=>m.label===selectedMetric):null; const details=selectedMetric?metricDetails[selectedMetric]:null;
  useEffect(()=>{const f=requestAnimationFrame(()=>setAnimated(true));return()=>cancelAnimationFrame(f)},[]);
  const downloadReport=()=>{const sections=metrics.map(m=>{const d=metricDetails[m.label];return `${m.label.toUpperCase()} — ${m.value}%\nEvidência: ${d.evidence}\nTrecho: ${d.quote}\nLeitura cognitiva: ${d.reading}\nO que aconteceu: ${d.miss}\nIntervenção recomendada: ${d.better}\nConfiança: ${d.confidence}`}).join('\n\n'); const report=`ZYVO — RELATÓRIO DE INTELIGÊNCIA CONVERSACIONAL\n\nReunião de planejamento · 10/09/2026 · 48 min · 6 participantes\nScore 82/100 · +6,4%\n\nDIAGNÓSTICO EXECUTIVO\nA reunião teve alta compreensão e boa capacidade de investigação, mas perdeu eficiência no momento de converter interesse em decisão. A principal ruptura ocorreu aos 18:27: o participante verbalizou valor + prazo (“ainda este ano”), porém a conversa retornou ao modo explicativo. A barreira real apareceu aos 12:43 como risco operacional, não preço.\n\nJANELA CRÍTICA\n18:27 — “Se conseguirmos colocar isso em funcionamento ainda este ano, faz sentido pra mim.”\nLeitura: forte evidência de avanço de intenção. Não prova fechamento; indica que a conversa passou de avaliação de valor para condição de implementação.\nAção recomendada: testar compromisso e isolar impedimentos em vez de acrescentar benefícios.\n\n${sections}\n\nPRÓXIMA REUNIÃO\n1. Ao ouvir linguagem de implementação, pare de vender e teste decisão.\n2. Reutilize palavras exatas do participante para confirmar motivação.\n3. Separe objeção financeira de risco operacional.\n4. Após confirmação de entendimento, faça pergunta de avanço em vez de repetir explicação.\n\nNota metodológica: inferências são hipóteses baseadas em evidências da conversa e devem ser apresentadas com nível de confiança, nunca como leitura absoluta da mente do participante.`; const blob=new Blob([report],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='zyvo-inteligencia-conversacional.txt';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)};
- return <section className={`full-analysis ${animated?'analysis-loaded':''}`}>
+ return <section className={analysisThemeClass(`full-analysis ${animated?'analysis-loaded':''}`)} style={analysisThemeVars as CSSProperties}>
   <div className="analysis-heading"><button onClick={onBack}><ChevronLeft/></button><div><span>ANÁLISE DE REUNIÕES</span><h1>Desempenho que<br/>gera resultados.</h1><p>IA conversacional baseada em evidências,<br/>momentos e decisões da reunião.</p></div></div>
   <div className="analysis-video"><div className="analysis-video-image"/><button><Play fill="currentColor"/></button><time>48:12</time><Maximize2 className="analysis-expand"/></div>
   <article className="analysis-meeting analysis-panel"><div className="analysis-date"><CalendarDays/>10 de setembro de 2026 • 14:00 <MoreVertical/></div><h2>Reunião de planejamento</h2><p>Estratégia, proposta e próximos passos.</p><div className="analysis-people"><div className="analysis-avatars">{participantPhotos.map((p,i)=><img src={p} alt={`Participante ${i+1}`} key={p}/>)}<b>+1</b></div><span>6 participantes • 48 min</span></div></article>

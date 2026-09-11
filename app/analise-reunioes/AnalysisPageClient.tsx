@@ -1,11 +1,14 @@
 'use client';
 
 import {useEffect,useMemo,useState} from 'react';
+import type {CSSProperties} from 'react';
 import {useRouter} from 'next/navigation';
 import {CalendarDays,ChevronLeft,ChevronRight,CircleHelp,Headphones,Maximize2,MessageCircle,Mic2,Play,Sparkles,Target,Users} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
 import AppTopbar from '../AppTopbar';
+import {analysisThemeClass,analysisThemeVars} from '../analysis-theme.mjs';
 import './analysis.css';
+import '../analysis-theme.css';
 
 type Recording={id:string;title:string;phrase?:string;thumbnail?:string;performance?:number;src?:string};
 type Metric={label:string;value:number;copy:string;Icon:typeof MessageCircle};
@@ -91,7 +94,7 @@ export default function AnalysisPageClient(){
     <AppSidebar/>
     <section className="content">
       <AppTopbar/>
-      <section className="analysis-stage">
+      <section className={analysisThemeClass('analysis-stage')} style={analysisThemeVars as CSSProperties}>
         <div className="analysis-heading"><button onClick={()=>router.push('/gravacoes')} aria-label="Voltar para gravações"><ChevronLeft/></button><div><span>ANÁLISE DE REUNIÕES</span><h1>Desempenho que<br/>gera resultados.</h1><p>IA conversacional baseada em evidências,<br/>momentos e decisões da reunião.</p></div></div>
 
         <div className="analysis-video">
@@ -104,9 +107,9 @@ export default function AnalysisPageClient(){
 
         <article className="analysis-meeting analysis-panel"><div className="analysis-date"><CalendarDays/>10 de setembro de 2026 • 14:00</div><h2>{recording?.title||'Reunião de planejamento'}</h2><p>{recording?.phrase||'Estratégia, proposta e próximos passos.'}</p><div className="analysis-people"><div className="analysis-avatars">{participantPhotos.map((photo,index)=><img src={photo} alt={`Participante ${index+1}`} key={photo}/>)}<b>+1</b></div><span>6 participantes • 48 min</span></div></article>
 
-        <article className="analysis-score analysis-panel"><div className="analysis-score-ring" style={{background:`conic-gradient(#3a8056 ${score}%,#dfe7e3 0)`}}><div><strong>{score}</strong><span>/100</span><b>Score geral</b><em>↑ +6,4%</em><small>vs. última análise</small></div></div></article>
+        <article className="analysis-score analysis-panel"><div className="analysis-score-ring" style={{'--analysis-score':`${score}%`} as CSSProperties}><div><strong>{score}</strong><span>/100</span><b>Score geral</b><em>↑ +6,4%</em><small>vs. última análise</small></div></div></article>
 
-        <div className="analysis-metrics">{metrics.map(({label,value,copy,Icon})=><article className="analysis-metric analysis-panel" key={label}><div className="analysis-mini-ring" style={{background:`conic-gradient(#377e51 ${value*3.6}deg,#e0e7e4 0)`}}><strong>{value}%</strong></div><Icon/><h3>{label}</h3><p>{copy}</p><div className="analysis-bar"><i style={{width:`${value}%`}}/></div></article>)}</div>
+        <div className="analysis-metrics">{metrics.map(({label,value,copy,Icon})=><article className="analysis-metric analysis-panel" key={label}><div className="analysis-mini-ring" style={{'--score':`${value*3.6}deg`} as CSSProperties}><strong>{value}%</strong></div><Icon/><h3>{label}</h3><p>{copy}</p><div className="analysis-bar"><i style={{width:`${value}%`}}/></div></article>)}</div>
 
         <aside className="analysis-insights analysis-panel"><h3><Sparkles/> Principais insights</h3><div><b>↑</b><p><strong>{strongest.label} é o principal ponto forte · {strongest.value}%</strong><span>Maior evidência de performance nesta gravação.</span></p></div><div><b>!</b><p><strong>{weakest.label} pede mais atenção · {weakest.value}%</strong><span>É a skill com maior margem de evolução nesta reunião.</span></p></div><div><b>◎</b><p><strong>Score individual desta reunião: {score}/100</strong><span>Os indicadores exibidos pertencem somente a esta gravação.</span></p></div><div><b>→</b><p><strong>Próximo passo</strong><span>Use os pontos fortes como base e ataque a menor nota na próxima reunião.</span></p></div></aside>
 
