@@ -22,12 +22,13 @@ const defaults:Recording[]=[
  {id:'r9',title:'Entrevista estratégica',phrase:'Perguntas melhores, respostas mais úteis.',thumbnail:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=86',performance:4,font:'SF Pro Display',fontSize:34},
 ];
 
-function Rail({children,className=''}:{children:React.ReactNode;className?:string}){
+function Rail({children,className='',loop=false}:{children:React.ReactNode;className?:string;loop?:boolean}){
  const ref=useRef<HTMLDivElement>(null);const drag=useRef({active:false,x:0,left:0});
  const down=(e:PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button,input,select,textarea'))return;const el=ref.current;if(!el)return;drag.current={active:true,x:e.clientX,left:el.scrollLeft};el.setPointerCapture(e.pointerId);el.classList.add('dragging')};
  const move=(e:PointerEvent<HTMLDivElement>)=>{const el=ref.current;if(!el||!drag.current.active)return;el.scrollLeft=drag.current.left-(e.clientX-drag.current.x)};
  const up=(e:PointerEvent<HTMLDivElement>)=>{const el=ref.current;if(!el)return;drag.current.active=false;try{el.releasePointerCapture(e.pointerId)}catch{}el.classList.remove('dragging')};
  useEffect(()=>{const el=ref.current;if(!el)return;const wheel=(e:WheelEvent)=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(Math.abs(e.deltaY)<2)return;e.preventDefault();el.scrollLeft+=e.deltaY*.78};el.addEventListener('wheel',wheel,{passive:false});return()=>el.removeEventListener('wheel',wheel)},[]);
+ useEffect(()=>{const el=ref.current;if(!el||!loop)return;let frame=0;const center=()=>{const segment=el.scrollWidth/3;if(segment>0)el.scrollLeft=segment};frame=requestAnimationFrame(center);const keepLoop=()=>{const segment=el.scrollWidth/3;if(!segment)return;if(el.scrollLeft<segment*.45)el.scrollLeft+=segment;else if(el.scrollLeft>segment*1.55)el.scrollLeft-=segment};el.addEventListener('scroll',keepLoop,{passive:true});return()=>{cancelAnimationFrame(frame);el.removeEventListener('scroll',keepLoop)}},[loop,children]);
  return <div ref={ref} className={`recordings-rail ${className}`} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>{children}</div>;
 }
 
@@ -41,6 +42,9 @@ export default function RecordingsPage(){
  const changeThumbnail=(e:ChangeEvent<HTMLInputElement>)=>{const file=e.target.files?.[0];const id=pendingThumbnailId.current;if(!file||!id)return;const reader=new FileReader();reader.onload=()=>setRecordings(list=>list.map(item=>item.id===id?{...item,thumbnail:String(reader.result)}:item));reader.readAsDataURL(file);e.target.value=''};
  const featured=recordings[active]??recordings[0];
  const shift=(dir:number)=>{if(!recordings.length)return;setActive(i=>(i+dir+recordings.length)%recordings.length)};
+ const rowOne=[...recordings,...recordings,...recordings];
+ const reversed=[...recordings].reverse();
+ const rowTwo=[...reversed,...reversed,...reversed];
  return <main className="recordings-page"><AppSidebar/><section className="recordings-content"><AppTopbar/><div className="recordings-stage">
   <input ref={fileRef} className="recordings-file-input" type="file" accept="image/*" onChange={changeThumbnail}/>
   {featured&&<section className="recordings-featured-wrap">
@@ -54,8 +58,8 @@ export default function RecordingsPage(){
    </Rail>
    <button className="recordings-arrow right" onClick={()=>shift(1)} aria-label="Próxima gravação"><ChevronRight/></button>
   </section>}
-  <Rail>{recordings.slice(0,7).map(item=><SmallCard key={`a-${item.id}`} item={item} onOpen={()=>setActive(recordings.findIndex(r=>r.id===item.id))} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>router.push('/skills')}/>)}</Rail>
-  <Rail>{recordings.slice().reverse().map(item=><SmallCard key={`b-${item.id}`} item={item} onOpen={()=>setActive(recordings.findIndex(r=>r.id===item.id))} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>router.push('/skills')}/>)}</Rail>
+  <Rail className="recordings-row-one" loop>{rowOne.map((item,index)=><SmallCard key={`a-${index}-${item.id}`} item={item} onOpen={()=>setActive(recordings.findIndex(r=>r.id===item.id))} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>router.push('/skills')}/>)}</Rail>
+  <Rail className="recordings-row-two" loop>{rowTwo.map((item,index)=><SmallCard key={`b-${index}-${item.id}`} item={item} onOpen={()=>setActive(recordings.findIndex(r=>r.id===item.id))} onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>router.push('/skills')}/>)}</Rail>
   <button className="recordings-back" onClick={()=>router.push('/')}>Voltar ao menu <ChevronRight/></button>
  </div></section>
  {editing&&<EditModal value={editing} onClose={()=>setEditing(null)} onSave={update} onThumb={()=>{pickThumbnail(editing.id);setEditing(null)}}/>}</main>;
