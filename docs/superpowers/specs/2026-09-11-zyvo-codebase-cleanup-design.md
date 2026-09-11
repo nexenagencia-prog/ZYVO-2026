@@ -4,6 +4,18 @@
 
 Organizar a branch `dev` para reduzir travamentos, remover código morto e deixar cada área do app isolada, previsível e leve, sem alterar o visual atualmente aprovado e sem tocar na `main` ou fazer deploy na Vercel.
 
+## Diagnóstico confirmado
+
+O travamento do ambiente local não é causado pelo estado `Ready` do Next nem por um erro visual da Home. O Next 15 está inferindo `/Users/pietromedeiros` como raiz do workspace por encontrar um `package-lock.json` acima do projeto. Com isso, o watcher tenta acompanhar uma árvore muito maior que o repositório e registra repetidamente `EMFILE: too many open files, watch`. Em uma execução controlada, a primeira requisição demorou 12,7 segundos e retornou 404; a rota de análise permaneceu sem resposta por mais de 30 segundos.
+
+O problema é ampliado por três fontes de trabalho desnecessário:
+
+1. `scripts/dev-sync.mjs` executa `git pull --ff-only origin dev` a cada três segundos durante o desenvolvimento.
+2. `INICIAR-ZYVO.command` mantém outro loop de sincronização a cada vinte segundos.
+3. Gravações renderiza três cópias completas de cada item em cada trilho inferior, incluindo todos os controles interativos.
+
+O clique `Gravações → Analisar` já grava `zyvo-selected-analysis` e chama o roteador do Next, mas a navegação não termina quando o runtime está saturado. A rota `/analise-reunioes` também deve ser validada isoladamente depois da correção da raiz do watcher.
+
 ## Princípios
 
 1. Remover código não utilizado, duplicado ou substituído por implementações mais novas.
@@ -21,6 +33,8 @@ O `app/layout.tsx` deve permanecer mínimo. Componentes globais só podem ficar 
 
 Arquivos de enhancer/bridge antigos que não estiverem mais importados devem ser removidos do repositório depois de confirmar que nenhuma rota depende deles.
 
+O Next deve receber a raiz absoluta do próprio repositório em sua configuração. O comando `npm run dev` deve iniciar somente o servidor de desenvolvimento, sem operações de Git, polling ou sincronização automática. Atualizações da branch permanecem uma ação explícita do desenvolvedor.
+
 ### Gravações
 
 A aba `app/gravacoes` continuará responsável por:
@@ -32,6 +46,8 @@ A aba `app/gravacoes` continuará responsável por:
 - navegar para a análise da gravação selecionada.
 
 O botão `Analisar` deve salvar apenas o identificador/dados necessários e navegar pela API normal do Next, sem listeners globais de captura e sem scripts que observem o DOM.
+
+Os trilhos inferiores devem renderizar uma única instância de cada gravação por trilho. A rolagem horizontal, as larguras alternadas, as ações e o aspecto visual permanecem; continuidade artificial não justifica triplicar toda a árvore interativa. O retorno ao card principal deve usar uma referência React da própria seção, sem `document.querySelector`.
 
 ### Análise de Reuniões
 
@@ -45,11 +61,22 @@ A rota `/skills` continua sendo a visão geral de performance. O botão `Ver an�
 
 A lógica compartilhada entre Skills e análise deve ser extraída apenas quando isso reduzir duplicação real e deixar responsabilidades claras.
 
+As três linhas de “Próximas ações” devem existir diretamente no JSX/dados da página. `SkillsActionsEnhancer.tsx`, seu `MutationObserver`, clonagem de nós e o layout criado somente para montar esse enhancer devem ser removidos sem alterar o conteúdo visível aprovado.
+
 ### CSS
 
 CSS deve ficar o mais próximo possível da área que usa seus seletores. Imports globais de CSS específicos de páginas devem ser removidos de `app/layout.tsx` quando puderem ser importados na própria rota/componente.
 
 Arquivos CSS antigos, substituídos ou sem referência devem ser removidos após verificação de uso.
+
+Os overrides `recordings-spacing.css` e `recordings-final-fixes.css` devem ser consolidados em `gravacoes.css` na mesma ordem efetiva da cascata. Declarações sobrepostas serão reduzidas somente quando o valor final permanecer idêntico. A página será comparada visualmente antes e depois da consolidação.
+
+## Higiene do repositório
+
+- Adicionar regras de ignore para `.next/`, `node_modules/` e artefatos locais gerados.
+- Manter no repositório os arquivos de configuração e lock necessários para instalação e build determinísticos.
+- Remover a cópia aninhada não rastreada `ZYVO-2026/`, que contém um clone antigo de 3,7 MB e um `.git` próprio dentro do projeto.
+- Preservar a permissão executável já aplicada localmente a `INICIAR-ZYVO.command`.
 
 ### Ferramentas flutuantes
 
@@ -84,6 +111,10 @@ Os seguintes arquivos já foram identificados como suspeitos/legados e devem ser
 - `app/SelectedRecordingAnalysisBridge.tsx`
 - `app/AnalysisVideoControls.tsx`
 - `app/analise-reunioes/OpenAnalysisOnMount.tsx`
+- `app/skills/SkillsActionsEnhancer.tsx`
+- `app/skills/layout.tsx`, caso não reste outra responsabilidade após remover o enhancer
+- `scripts/dev-sync.mjs`
+- `app/gravacoes/recordings-spacing.css` e `app/gravacoes/recordings-final-fixes.css`, depois da consolidação fiel em `gravacoes.css`
 
 Outros arquivos serão removidos somente após confirmar que não são importados por nenhuma rota ativa.
 
@@ -131,6 +162,11 @@ A limpeza será considerada concluída quando:
 5. CSS específico não estiver sendo carregado globalmente sem necessidade.
 6. Dados locais existentes continuarem compatíveis.
 7. O projeto permanecer visualmente fiel ao estado atual, salvo correções estritamente necessárias para funcionamento.
+8. O Next iniciar sem aviso de raiz incorreta e sem `EMFILE`.
+9. `npm run dev` não executar comandos Git nem criar timers de sincronização.
+10. Cada gravação aparecer uma única vez por trilho inferior no DOM.
+11. A análise selecionada abrir pelo botão `Analisar`, refletir o id da URL e continuar acessível por abertura direta da rota.
+12. Testes automatizados e `npm run build` encerrarem com código zero.
 
 ## Fora do escopo
 
