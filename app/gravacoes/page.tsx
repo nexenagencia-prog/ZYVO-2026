@@ -42,19 +42,20 @@ export default function RecordingsPage(){
  const changeThumbnail=(e:ChangeEvent<HTMLInputElement>)=>{const file=e.target.files?.[0];const id=pendingThumbnailId.current;if(!file||!id)return;const reader=new FileReader();reader.onload=()=>setRecordings(list=>list.map(item=>item.id===id?{...item,thumbnail:String(reader.result)}:item));reader.readAsDataURL(file);e.target.value=''};
  const featured=recordings[active]??recordings[0];
  const shift=(dir:number)=>{if(!recordings.length)return;setActive(i=>(i+dir+recordings.length)%recordings.length)};
+ const featuredItems=[...recordings,...recordings,...recordings];
  const rowOne=[...recordings,...recordings,...recordings];
  const reversed=[...recordings].reverse();
  const rowTwo=[...reversed,...reversed,...reversed];
- return <main className="recordings-page"><AppSidebar/><section className="recordings-content"><AppTopbar/><div className="recordings-stage">
+ return <main className="recordings-page"><AppSidebar/><section className="recordings-content"><AppTopbar floating={false}/><div className="recordings-stage">
   <input ref={fileRef} className="recordings-file-input" type="file" accept="image/*" onChange={changeThumbnail}/>
   {featured&&<section className="recordings-featured-wrap">
    <button className="recordings-arrow left" onClick={()=>shift(-1)} aria-label="Gravação anterior"><ChevronLeft/></button>
-   <Rail className="recordings-featured-rail">
-    {recordings.map((item,index)=><article className={`recordings-featured-card ${index===active?'is-active':''}`} key={item.id} style={{backgroundImage:`linear-gradient(180deg,rgba(4,8,12,.03),rgba(4,8,12,.72)),url(${item.thumbnail})`}} onClick={()=>setActive(index)}>
+   <Rail className="recordings-featured-rail" loop>
+    {featuredItems.map((item,index)=>{const originalIndex=index%recordings.length;return <article className={`recordings-featured-card ${originalIndex===active?'is-active':''}`} key={`featured-${index}-${item.id}`} style={{backgroundImage:`linear-gradient(180deg,rgba(4,8,12,.03),rgba(4,8,12,.72)),url(${item.thumbnail})`}} onClick={()=>setActive(originalIndex)}>
       <div className="featured-copy"><span>GRAVAÇÃO ZYVO</span><h1 style={{fontFamily:item.font,fontSize:`${item.fontSize}px`}}>{item.title}</h1><p>{item.phrase}</p><PerformanceStars value={item.performance}/></div>
       <div className="featured-actions"><button onClick={e=>{e.stopPropagation();router.push('/skills')}}><BarChart3/>Analisar</button><button className="watch" onClick={e=>e.stopPropagation()}><Play fill="currentColor"/>Assistir agora</button></div>
       <CardTools onEdit={()=>setEditing(item)} onThumb={()=>pickThumbnail(item.id)} onDelete={()=>remove(item.id)} onAnalyze={()=>router.push('/skills')}/>
-    </article>)}
+    </article>})}
    </Rail>
    <button className="recordings-arrow right" onClick={()=>shift(1)} aria-label="Próxima gravação"><ChevronRight/></button>
   </section>}
