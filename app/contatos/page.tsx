@@ -4,9 +4,6 @@ import {useMemo,useState} from 'react';
 import {ChevronDown,MoreHorizontal,Plus,SlidersHorizontal,Star,Video} from 'lucide-react';
 import AppSidebar from '../AppSidebar';
 import AppTopbar from '../AppTopbar';
-import '../refine.css';
-import '../cms-home.css';
-import '../home-overrides.css';
 import './contatos.css';
 import './contatos-favorites.css';
 
@@ -39,7 +36,7 @@ export default function ContatosPage(){
 
  return <main className="contacts-page">
    <AppSidebar/>
-   <AppTopbar/>
+   <AppTopbar floating/>
    <section className="contacts-content">
      <div className="contacts-inner">
        <h1>Conexões<br/>para reuniões de <span>alto nível.</span></h1>
