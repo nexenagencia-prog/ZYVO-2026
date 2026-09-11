@@ -17,7 +17,7 @@ type AppTopbarProps={
 };
 
 export default function AppTopbar({
-  floating=true,
+  floating=false,
   searchPlaceholder='Buscar reunião, pessoa ou gravação...',
   nextLabel='Sua próxima Reunião',
   nextDateTime='14:00 — 30 Set 2026',
