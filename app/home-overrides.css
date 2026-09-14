@@ -24,3 +24,5 @@ html body .sidebar.expanded .avatar-meta,html body .sidebar.expanded .side-item 
 @keyframes sidebarTextIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
 @media(max-width:1450px){html body .content.shifted{padding-left:10.5vw!important;transform:translate3d(8.5vw,0,0)}html body .content.shifted .topbar{grid-template-columns:118px minmax(320px,1.05fr) minmax(340px,1fr) 190px 44px!important;column-gap:16px!important}html body .content.shifted .search-box{max-width:none!important;margin-left:10px!important}}
 @media(prefers-reduced-motion:reduce){html body .content,html body .sidebar,html body .side-item,html body .sidebar-toggle,html body .avatar-meta{transition:none!important;animation:none!important}}
+
+.hero-brand-logo{display:block;width:min(360px,55vw);height:auto;margin:0 0 18px;border-radius:8px;box-shadow:0 14px 30px rgba(0,0,0,.18)}
