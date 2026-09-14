@@ -79,7 +79,7 @@ export default function HumanProClient(){
         '--particle-drift-x':`${particle.driftX}px`,
         '--particle-drift-y':`${particle.driftY}px`,
       } as React.CSSProperties}/>)}</div>
-      <div className="human-main">
+      <div className="human-main reference-controls">
         <header className="human-hero">
           <h1>{presentation.title}</h1>
           {presentation.subtitle&&<p>{presentation.subtitle}</p>}
